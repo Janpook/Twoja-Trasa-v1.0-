@@ -4,7 +4,7 @@
 
 Aplikacja webowa do śledzenia komunikacji miejskiej w Poznaniu w czasie rzeczywistym. Projekt w wersji 1.0 został stworzony w oparciu o czysty HTML, CSS i JavaScript, intensywnie wykorzystując dane GTFS i GTFS-Realtime.
 
-* **Licencja:** [Wstaw Tutaj Nazwę Licencji, np. GNU AGPLv3]
+* **Licencja:** GNU AGPLv3
 * **Link do aktualnej wersji aplikacji:** [https://twojatrasa.online](https://twojatrasa.online)
 
 ## O Projekcie
@@ -23,7 +23,7 @@ Udostępniam kod źródłowy wersji 1.0 z kilku powodów:
 
 **Ważne:** Kod w tym repozytorium reprezentuje **historyczną wersję 1.0 aplikacji** i ma charakter archiwalny.
 
-Obecnie rozwijana i publicznie dostępna jest **wersja 2.0**, która została przepisana od podstaw. Używa ona zupełnie innej, nowocześniejszej struktury i technologii, które pozwoliły na znaczną poprawę wydajności, skalowalności i dodanie wielu nowych funkcji.
+Obecnie rozwijana jest **wersja 2.0**, która nie jest jeszcze publicznie dostępna. Została ona przepisana od podstaw i używa zupełnie innej, nowocześniejszej struktury oraz technologii, które pozwoliły na znaczną poprawę wydajności, skalowalności i dodanie wielu nowych funkcji.
 
 To repozytorium pozostaje jako pamiątka, wgląd w początki projektu oraz jako zasób edukacyjny. Nie jest ono już aktywnie rozwijane.
 
