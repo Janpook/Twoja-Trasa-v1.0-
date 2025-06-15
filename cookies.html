@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // Sprawdź zgodę na analitykę przed konfiguracją
+      try {
+          const consent = JSON.parse(localStorage.getItem('cookieConsent'));
+          if (consent && consent.analytics === true) {
+              gtag('config', 'G-N9G560TT5P');
+              console.log('GA config loaded - analytics consent given.');
+          } else {
+              console.log('GA config skipped - analytics consent not given.');
+          }
+      } catch (e) {
+          console.error("Error checking consent for GA config:", e);
+          // W przypadku błędu, domyślnie nie ładuj GA
+      }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ustawienia Ciasteczek - TwojaTrasa.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <style>
+        /* --- PEŁNY BLOK CSS SKOPIOWANY Z POLITYKA-PRYWATNOSCI.HTML dla spójności --- */
+        :root { --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333; --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b; --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00; --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2); --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px; --border-radius: 4px; --transition: all 0.2s ease-in-out; --danger-color: #f44336; --warning-color: #ff9800; --ok-color: var(--accent); --info-color: #00bcd4; --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c; --error-color: var(--danger-color); --error-hover-color: #d32f2f;} /* Dodano error/hover dla przycisku delete */
+        body[data-theme="light"] { --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee; --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd; --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00; --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1); --danger-color: #e53935; --warning-color: #fb8c00; --ok-color: var(--accent); --info-color: #00acc1; --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c; --error-color: var(--danger-color); --error-hover-color: #c62828;}
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.7; transition: var(--transition); padding-top: 55px; }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); font-weight: 500; }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul { list-style: disc; padding-left: 20px; margin-left: 1.1em; }
+        ol { list-style: decimal; padding-left: 20px; margin-left: 1.1em; } /* Dodano styl dla list numerowanych */
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .logo-option-2 { display: flex; align-items: center; }
+        .logo-option-2 .logo-icon { margin-right: 8px; font-size: 1.2em; color: var(--accent); line-height: 1; }
+        .logo-option-2 span { color: var(--accent); }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; margin-left: 10px; }
+        .top-bar .back-link:hover { color: var(--accent-hover); }
+        .top-bar .nav-links { display: flex; }
+        .container { max-width: 850px; margin: 20px auto; padding: 30px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+        .page-header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .page-header h1 { font-size: calc(var(--font-size-large) + 6px); font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: inline-flex; align-items: center; gap: 12px; border: none; padding: 0; }
+        .page-header h1 i { color: var(--accent); }
+        .page-header .subtitle { font-size: var(--font-size-large); color: var(--text-secondary); margin-top: 0; }
+        .page-header .privacy-link { font-size: var(--font-size-small); margin-top: 15px; display: block; } /* Dodano styl dla linku do polityki */
+        .content-section { margin-bottom: 35px; } /* Użyjemy tej klasy dla spójności, jeśli będzie potrzebna */
+        /* --- Style specyficzne dla cookies.html --- */
+        .cookie-option { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-tertiary); /* Lepszy kontrast */ border-radius: var(--border-radius); margin-bottom: 15px; border: 1px solid var(--border-color); transition: var(--transition); }
+        .cookie-option .option-label { flex-grow: 1; margin-right: 15px; }
+        .cookie-option label.main-label { font-size: var(--font-size-base); font-weight: 500; display: block; margin-bottom: 3px; color: var(--text-primary); }
+        .cookie-option small { font-size: var(--font-size-small); color: var(--text-secondary); display: block; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-primary); /* Dopasowanie tła */ transition: .3s; border-radius: 24px; border: 1px solid var(--border-color); /* Dodano ramkę */ }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; /* Poprawiono pozycję */ background-color: var(--text-secondary); transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+        input:focus + .slider { box-shadow: 0 0 3px var(--accent); border-color: var(--accent); }
+        input:checked + .slider:before { background-color: white; /* Kulka biała na tle akcentu */ transform: translateX(20px); }
+        input:disabled + .slider { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.6; border-color: var(--border-color);}
+        input:disabled + .slider:before { background-color: var(--text-tertiary); }
+        .buttons { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+        .buttons button { background-color: var(--accent); color: var(--text-on-accent); padding: 10px 20px; border-radius: var(--border-radius); font-size: var(--font-size-base); font-weight: 500; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; flex-grow: 1; justify-content: center; min-width: 160px; border: 1px solid var(--accent); } /* Dodano ramkę dla spójności */
+        .buttons button:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+        .buttons button i { font-size: 1.1em; }
+        .buttons button.delete { background: var(--error-color); color: white; border-color: var(--error-color); }
+        .buttons button.delete:hover { background: var(--error-hover-color); border-color: var(--error-hover-color); }
+        .note { font-size: var(--font-size-small); color: var(--text-tertiary); border-left: 3px solid var(--border-color); padding: 5px 0 5px 15px; margin: 20px 0; background-color: transparent; border-radius: 0; }
+        .footer-note { text-align: center; margin-top: 40px; font-size: var(--font-size-small); color: var(--text-tertiary); border-top: 1px solid var(--border-color); padding-top: 20px; }
+        @media (max-width: 768px) { :root { --font-size-base: 13px; --font-size-small: 11px; --font-size-large: 15px; } .top-bar { height: 50px; padding: 0 10px; } .top-bar .logo { font-size: 18px; } .top-bar .back-link { font-size: var(--font-size-base); } body { padding-top: 50px; } .container { margin: 15px; padding: 20px; } /* Zmieniono padding */ .page-header h1 { font-size: 20px; } .page-header .subtitle { font-size: var(--font-size-base); } .cookie-option { padding: 12px; flex-wrap: wrap; } .cookie-option .option-label { margin-right: 0; margin-bottom: 10px; } .buttons { flex-direction: column; gap: 10px; } .buttons button { width: 100%; min-width: unset; } .note { font-size: 11px; padding-left: 10px; } .footer-note { font-size: 11px; } }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span>Trasa</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+            <a href="menu.html" class="back-link"><i class="fas fa-bars"></i> Menu</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-cookie-bite"></i> Ustawienia Ciasteczek</h1>
+            <p class="subtitle">Zarządzaj swoimi preferencjami dotyczącymi plików cookie w serwisie TwojaTrasa.online.</p>
+            <p class="privacy-link">Więcej informacji znajdziesz w naszej <a href="polityka-prywatnosci.html">Polityce Prywatności</a>.</p>
+        </div>
+
+        <div class="cookie-option">
+              <div class="option-label">
+                  <label for="necessaryCookies" class="main-label">Niezbędne</label>
+                  <small>Wymagane do podstawowego działania serwisu, np. zapamiętania wybranego motywu.</small>
+              </div>
+             <label class="switch">
+                  <input type="checkbox" id="necessaryCookies" checked disabled>
+                  <span class="slider"></span>
+             </label>
+        </div>
+
+        <div class="cookie-option">
+              <div class="option-label">
+                  <label for="analyticsCookies" class="main-label">Analityczne</label>
+                  <small>Pomagają nam anonimowo zrozumieć, jak używasz strony (za pomocą Google Analytics).</small>
+              </div>
+             <label class="switch">
+                  <input type="checkbox" id="analyticsCookies">
+                  <span class="slider"></span>
+             </label>
+        </div>
+
+        <div class="cookie-option">
+            <div class="option-label">
+                <label for="marketingCookies" class="main-label">Marketingowe</label>
+                <small>Służą do personalizacji treści lub reklam (obecnie nieużywane w tym serwisie).</small>
+            </div>
+           <label class="switch">
+                <input type="checkbox" id="marketingCookies"> <span class="slider"></span>
+           </label>
+        </div>
+        <p class="note">
+            Zmiana ustawień ciasteczek analitycznych może wymagać odświeżenia strony, aby w pełni zastosować zmiany (np. załadowanie lub nieładowanie skryptu Google Analytics).
+        </p>
+
+        <div class="buttons">
+            <button onclick="saveCookieSettings()"><i class="fas fa-save"></i> Zapisz Ustawienia</button>
+            <button class="delete" onclick="deleteAllDataConfirm()"><i class="fas fa-trash-alt"></i> Usuń Wszystkie Dane</button>
+        </div>
+         <p class="note" style="margin-top: 20px; text-align: center;">
+            <strong>Uwaga:</strong> Przycisk "Usuń Wszystkie Dane" czyści <strong>wszystkie</strong> informacje zapisane przez tę stronę w Twojej przeglądarce, w tym ustawienia ciasteczek, zapisany motyw, ulubione przystanki/linie (jeśli są zaimplementowane) itp. Używaj ostrożnie!
+        </p>
+
+        <div class="footer-note">
+             TwojaTrasa.online &copy; <span id="currentYear">2024</span>. Tworzone z pasją. | <a href="polityka-prywatnosci.html">Polityka Prywatności</a> | <a href="cookies.html">Ustawienia Cookies</a>
+        </div>
+    </div>
+
+    <script>
+        function applyTheme(theme) { document.body.setAttribute('data-theme', theme); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentTheme = 'dark';
+            try {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark' || savedTheme === 'light') {
+                    currentTheme = savedTheme;
+                }
+            } catch (e) { console.error("Error reading theme from localStorage:", e); }
+            applyTheme(currentTheme);
+            loadCookieSettings();
+
+            // Aktualizacja roku w stopce
+            const yearSpan = document.getElementById('currentYear');
+            if(yearSpan) {
+                const currentFullYear = new Date().getFullYear();
+                yearSpan.textContent = currentFullYear > 2024 ? `2024-${currentFullYear}` : currentFullYear;
+            }
+        });
+
+        function loadCookieSettings() {
+            try {
+                const consent = JSON.parse(localStorage.getItem('cookieConsent')) || {};
+                // Ustawiamy checkboxy zgodnie z zapisaną zgodą (lub false jeśli brak)
+                document.getElementById('analyticsCookies').checked = consent.analytics === true;
+                document.getElementById('marketingCookies').checked = consent.marketing === true;
+            } catch (e) { console.error("Error reading cookieConsent:", e); }
+        }
+
+        function saveCookieSettings() {
+            try {
+                const settings = {
+                    necessary: true, // Niezbędne są zawsze true
+                    analytics: document.getElementById('analyticsCookies').checked,
+                    marketing: document.getElementById('marketingCookies').checked,
+                    acceptedTimestamp: Date.now() // Zapisujemy czas akceptacji/modyfikacji
+                };
+                localStorage.setItem('cookieConsent', JSON.stringify(settings));
+
+                // Dodatkowa logika po zapisie - np. włączenie/wyłączenie GA
+                handleAnalyticsConsent(settings.analytics);
+
+                alert('Ustawienia ciasteczek zostały zapisane.');
+                console.log('Cookie settings saved:', settings);
+            } catch (e) {
+                 console.error("Error saving cookieConsent:", e);
+                 alert('Wystąpił błąd podczas zapisywania ustawień.');
+            }
+        }
+
+        function handleAnalyticsConsent(hasConsent) {
+            // Ta funkcja może być rozbudowana, aby dynamicznie ładować/blokować skrypty
+            // Na razie tylko loguje zmianę i informuje o potrzebie odświeżenia
+            console.log(`Analytics consent is now: ${hasConsent}. Refresh might be needed.`);
+            // Tutaj można dodać kod do np. wysłania 'consent update' do gtag, jeśli używasz Consent Mode v2
+            // gtag('consent', 'update', { 'analytics_storage': hasConsent ? 'granted' : 'denied' });
+        }
+
+        function deleteAllDataConfirm() {
+             if (confirm("CZY NA PEWNO chcesz usunąć WSZYSTKIE dane zapisane przez TwojaTrasa.online w tej przeglądarce?\n\nObejmuje to:\n- Ustawienia zgody na ciasteczka\n- Zapisany motyw (ciemny/jasny)\n- Ulubione przystanki/linie (jeśli istnieją)\n- Inne zapisane preferencje\n\nTej operacji NIE MOŻNA cofnąć!")) {
+                 deleteCookiesAndData();
+             }
+        }
+
+        function deleteCookiesAndData() {
+            try {
+                // Klucze do usunięcia - upewnij się, że lista jest aktualna!
+                const keysToRemove = ['cookieConsent', 'favorites', 'alerts', 'searchResults', 'searchQuery', 'theme', 'stopsVisible', /* dodaj inne jeśli istnieją */ ];
+                let itemsRemovedCount = 0;
+
+                keysToRemove.forEach(key => {
+                    if (localStorage.getItem(key) !== null) {
+                        localStorage.removeItem(key);
+                        itemsRemovedCount++;
+                    }
+                });
+
+                // Zresetuj checkboxy na stronie do stanu domyślnego (wyłączone)
+                document.getElementById('analyticsCookies').checked = false;
+                document.getElementById('marketingCookies').checked = false;
+
+                // Wróć do domyślnego ciemnego motywu
+                applyTheme('dark');
+
+                alert(`Usunięto ${itemsRemovedCount} zapisanych elementów danych.\nStrona powróciła do ustawień domyślnych.`);
+                console.log(`Local storage cleared. ${itemsRemovedCount} items removed.`);
+
+                // Opcjonalnie: odśwież stronę, aby upewnić się, że wszystko jest czyste
+                // window.location.reload();
+
+            } catch (e) {
+                 console.error("Error deleting data:", e);
+                 alert('Wystąpił błąd podczas usuwania danych.');
+            }
+        }
+    </script>
+</body>
+</html>
