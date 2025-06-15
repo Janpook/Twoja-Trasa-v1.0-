@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablica odjazdów - TwojaTrasa.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* --- Opcja 2: Logo z ikoną pinezki --- */
+        .logo-option-2 {
+            display: flex; /* Ustawia ikonę i tekst w jednej linii */
+            align-items: center; /* Wyśrodkowuje ikonę i tekst pionowo */
+        }
+
+        .logo-option-2 .logo-icon {
+            margin-right: 8px; /* Odstęp między ikoną a tekstem */
+            font-size: 1.2em; /* Lekko powiększona ikona */
+            color: var(--accent); /* Kolor ikony dopasowany do akcentu */
+            line-height: 1; /* Zapobiega problemom z wysokością linii */
+        }
+
+        /* Zachowujemy oryginalne podświetlenie 'Trasa' */
+        .logo-option-2 span {
+           color: var(--accent);
+        }
+        /* --- Koniec Opcji 2 --- */
+        /* --- CSS (Minimalistyczny / Dark / MPK - Taki jak w poprzedniej odpowiedzi) --- */
+        :root {
+            --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333;
+            --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b;
+            --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00;
+            --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px;
+            --border-radius: 4px; --transition: all 0.2s ease-in-out;
+            --top-bar-height: 55px; /* Dodana zmienna dla wysokości paska */
+        }
+        body[data-theme="light"] {
+            --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee;
+            --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd;
+            --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00;
+            --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+             height: 100%; /* Upewnij się, że html i body zajmują całą wysokość */
+             overflow: hidden; /* Zapobiegaj scrollowaniu body, jeśli iframe ma własne */
+        }
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            padding-top: var(--top-bar-height); /* Użycie zmiennej */
+            display: flex; /* Umożliwia iframe rozciągnięcie się */
+            flex-direction: column; /* Elementy (top-bar i iframe) ułożone pionowo */
+        }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul, ol { list-style: none; }
+        .top-bar {
+            position: fixed; /* Zmieniono na fixed, aby był zawsze widoczny */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--top-bar-height); /* Użycie zmiennej */
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 1000;
+            transition: var(--transition);
+            flex-shrink: 0; /* Zapobiega kurczeniu się paska */
+        }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .top-bar .logo span { color: var(--accent); }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+        .top-bar .back-link:hover { color: var(--accent-hover); }
+
+        /* --- Styl dla iframe --- */
+        iframe {
+            display: block; /* Traktuj jak element blokowy */
+            width: 100%; /* Pełna szerokość kontenera (body) */
+            height: calc(100vh - var(--top-bar-height)); /* Pełna wysokość widoku minus wysokość paska */
+            border: none; /* Usuń domyślną ramkę */
+            margin: 0; /* Usuń marginesy */
+            padding: 0; /* Usuń padding */
+            flex-grow: 1; /* Pozwól iframe wypełnić dostępną przestrzeń w flex container */
+        }
+
+        /* --- Główny kontener dla podstron (jeśli potrzebny na innych stronach) --- */
+        /* Usunięto z tej strony, bo iframe ma wypełniać całość */
+        /* .container { max-width: 900px; margin: 20px auto; padding: 20px; } */
+
+        /* --- Style specyficzne dla search.html (jeśli byłyby potrzebne) --- */
+        /* Usunięto z tej strony */
+
+         /* Media Queries (dostosowanie wysokości paska dla mniejszych ekranów) */
+         @media (max-width: 768px) {
+             :root {
+                 --font-size-base: 13px;
+                 --font-size-small: 11px;
+                 --font-size-large: 15px;
+                 --top-bar-height: 50px; /* Zmniejszona wysokość paska dla mobile */
+             }
+             .top-bar { height: var(--top-bar-height); padding: 0 10px; }
+             .top-bar .logo { font-size: 18px; }
+             .top-bar .back-link { font-size: var(--font-size-base); }
+             body { padding-top: var(--top-bar-height); }
+             /* iframe automatycznie dostosuje wysokość dzięki calc() i zmiennej */
+         }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span> Trasa</span>
+        </div>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+    </div>
+    <iframe src="https://twojatrasa.online/tablica/TABOROWE" title="Osadzona strona internetowa"></iframe>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-N9G560TT5P');
+    </script>
+</body>
+</html>

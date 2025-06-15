@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - TwojaTrasa.online</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // Konfiguracja GA zostanie wywołana w JS po sprawdzeniu zgody
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <style>
+        /* --- CSS (Styl inspirowany siatką ikon) - UJEDNOLICONY ZE STANDARDEM --- */
+        :root {
+             /* Zmienne z polityki prywatności dla spójności */
+            --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333;
+            --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b;
+            --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00;
+            --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px; --font-size-xlarge: 18px;
+            --border-radius: 8px;
+            --transition-duration: 0.15s;
+            --transition: all var(--transition-duration) ease-in-out;
+            --danger-color: #f44336; --warning-color: #ff9800; --ok-color: var(--accent); --info-color: #00bcd4;
+            --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c;
+            --error-color: var(--danger-color); --error-hover-color: #d32f2f;
+            --border-hover-color: var(--accent);
+            --shadow-hover-color: rgba(0, 0, 0, 0.25);
+            --font-size-icon: 1.8em;
+            --font-size-status: 10px;
+            --section-spacing: 35px;
+            --grid-gap: 15px;
+            --grid-min-item-width: 95px;
+        }
+        body[data-theme="light"] {
+            --bg-primary: #f4f7f6; --bg-secondary: #ffffff; --bg-tertiary: #f0f0f0;
+            --text-primary: #212121; --text-secondary: #5f5f5f; --text-tertiary: #9e9e9e;
+            --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00;
+            --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.08);
+            --danger-color: #e53935; --warning-color: #fb8c00; --ok-color: var(--accent); --info-color: #00acc1;
+            --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c;
+            --error-color: var(--danger-color); --error-hover-color: #c62828;
+            --border-hover-color: var(--accent);
+            --shadow-hover-color: rgba(0, 0, 0, 0.15);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.5; transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease; padding-top: 55px; }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); text-decoration: none; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
+        ul, ol { list-style: none; }
+
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); box-shadow: 0 2px 5px var(--shadow-color); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .logo-option-2 { display: flex; align-items: center; }
+        .logo-option-2 .logo-icon { margin-right: 8px; font-size: 1.2em; color: var(--accent); line-height: 1; }
+        .logo-option-2 span { color: var(--accent); }
+        .top-bar .nav-links { display: flex; }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; margin-left: 10px; padding: 8px 12px; border-radius: var(--border-radius); }
+        .top-bar .back-link:hover { color: var(--accent-hover); background-color: var(--bg-tertiary); }
+
+        .container { max-width: 800px; margin: 25px auto; padding: 20px; }
+        .menu-section { margin-bottom: var(--section-spacing); text-align: center; }
+        .menu-section h2 { font-size: var(--font-size-xlarge); font-weight: 500; color: var(--text-secondary); justify-content: center; text-align: center; margin: 0 auto 20px auto; display: inline-flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .menu-section h2 i { color: var(--text-secondary); font-size: 1em; width: 18px; text-align: center; margin-right: 5px; }
+
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-item-width), 1fr)); gap: var(--grid-gap); }
+        .grid-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 18px 10px; text-align: center; color: var(--text-primary); text-decoration: none; box-shadow: 0 2px 4px var(--shadow-color); transition: var(--transition); position: relative; min-height: 110px; }
+        .grid-item:hover { background-color: var(--bg-tertiary); border-color: var(--border-hover-color); transform: translateY(-3px); box-shadow: 0 6px 12px var(--shadow-hover-color); color: var(--accent); }
+        .grid-item i.icon { font-size: var(--font-size-icon); margin-bottom: 10px; color: var(--text-secondary); transition: var(--transition); }
+        .grid-item:hover i.icon { color: var(--accent); }
+        .grid-item span.label { font-size: var(--font-size-small); font-weight: 500; line-height: 1.3; color: inherit; display: block; }
+        .grid-item .external-link-icon { position: absolute; top: 8px; right: 8px; font-size: 0.7em; color: var(--text-tertiary); }
+
+        .new-badge {
+            display: inline-block;
+            background: var(--accent-yellow);
+            color: var(--text-on-accent);
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 2px 7px;
+            margin-left: 7px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            position: relative;
+            top: -2px;
+        }
+
+        .grid-item[data-setting] { cursor: pointer; }
+        .grid-item span.status-indicator { display: block; font-size: var(--font-size-status); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-top: 5px; opacity: 0.8; transition: var(--transition); }
+        .grid-item:hover span.status-indicator { color: var(--accent); opacity: 1; }
+        .grid-item[data-state="on"] span.status-indicator { color: var(--ok-color); font-weight: 700;}
+        .grid-item[data-state="off"] span.status-indicator { color: var(--danger-color); font-weight: 700;}
+        .grid-item[data-setting="theme"] i.icon.fa-sun { color: var(--accent-yellow); }
+        .grid-item[data-setting="theme"] i.icon.fa-moon { color: #a0b3f0; }
+        .grid-item[data-setting="theme"]:hover i.icon { color: var(--accent); }
+
+        .dropdown { position: relative; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 2px 4px var(--shadow-color); padding: 10px; z-index: 1000; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 5px 10px; color: var(--text-primary); text-decoration: none; transition: var(--transition); }
+        .dropdown-menu a:hover { background-color: var(--bg-tertiary); color: var(--accent); }
+
+        .grid-item.dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+        .grid-item.dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px var(--shadow-color);
+            z-index: 1000;
+            padding: 10px 0;
+            min-width: 150px;
+        }
+        .grid-item.dropdown .dropdown-menu a {
+            display: block;
+            padding: 8px 15px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: var(--font-size-small);
+            transition: background-color var(--transition-duration) ease;
+        }
+        .grid-item.dropdown .dropdown-menu a:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--accent);
+        }
+        .grid-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .notification-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: auto; max-width: 90%; z-index: 1500; display: flex; flex-direction: column-reverse; align-items: center; gap: 10px; }
+        .notification { display: flex; align-items: center; padding: 10px 15px; border-radius: var(--border-radius); box-shadow: 0 3px 8px var(--shadow-color); font-size: var(--font-size-base); color: #fff; width: auto; max-width: 400px; opacity: 1; transition: opacity 0.3s ease, transform 0.3s ease; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); }
+        .notification.info { background-color: var(--accent); color: var(--text-on-accent); border-color: var(--accent-hover); }
+        .notification.error { background-color: var(--danger-color); color: #fff; border-color: #a02820; }
+        .notification .icon { margin-right: 10px; font-size: 1.1em; }
+        .notification .close-btn { margin-left: 15px; background: none; border: none; font-size: 16px; cursor: pointer; color: inherit; opacity: 0.7; padding: 0; line-height: 1; }
+        .notification .close-btn:hover { opacity: 1; }
+
+        .footer-note { text-align: center; margin-top: calc(var(--section-spacing) + 10px); font-size: var(--font-size-small); color: var(--text-tertiary); border-top: 1px solid var(--border-color); padding-top: 20px; }
+        .footer-note a { color: var(--text-secondary); }
+        .footer-note a:hover { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            :root { --grid-min-item-width: 85px; --grid-gap: 12px; --font-size-icon: 1.6em; }
+            .top-bar { height: 50px; padding: 0 10px; }
+            .top-bar .logo { font-size: 18px; }
+            body { padding-top: 50px; }
+            .container { margin: 15px; padding: 15px; }
+            .menu-section h2 { font-size: var(--font-size-large); padding-bottom: 8px; margin-bottom: 15px; }
+            .grid-item { padding: 15px 8px; min-height: 100px; }
+            .grid-item i.icon { font-size: 1.7em; margin-bottom: 8px; }
+            .grid-item span.label { font-size: 10px; }
+            .grid-item span.status-indicator { font-size: 9px; }
+            .notification { max-width: 95%; font-size: 13px; }
+            .footer-note { font-size: 11px; }
+        }
+        @media (max-width: 400px) {
+            :root { --grid-min-item-width: 75px; --grid-gap: 10px; }
+            .grid-item span.label { font-size: 9px; }
+        }
+        .menu-section .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-item-width), 1fr));
+            gap: var(--grid-gap);
+            justify-content: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: var(--bg-secondary);
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            width: 80%;
+            max-width: 500px;
+            color: var(--text-primary);
+        }
+        .modal-content h2 {
+            margin-bottom: 15px;
+            font-size: var(--font-size-xlarge);
+            text-align: center;
+        }
+        .modal-content ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+        .modal-content li {
+            margin-bottom: 10px;
+        }
+        .close-btn {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover {
+            color: var(--accent);
+        }
+        .modal-footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+        }
+        .modal-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .modal-footer a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+        #lineColorModal .modal-content {
+            text-align: center;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span>Trasa</span>
+        </div>
+        <div class="nav-links"> <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <section class="menu-section">
+            <h2><i class="fas fa-route"></i> Nawigacja</h2>
+            <div class="grid-menu">
+                <a href="index.html" class="grid-item">
+                    <i class="fas fa-map-marked-alt icon"></i>
+                    <span class="label">Mapa na żywo</span>
+                </a>
+                <a href="favorites.html" class="grid-item">
+                    <i class="fas fa-star icon"></i>
+                    <span class="label">Ulubione</span>
+                </a>
+                <a href="https://twojatrasa.online/tablica/TABOROWE/" class="grid-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-table icon"></i>
+                    <span class="label">Tablica</span>
+                    <i class="fas fa-external-link-alt external-link-icon"></i>
+                </a>
+                <a href="zaplanuj.html" class="grid-item" id="vehicleListMenuItem">
+                    <i class="fas fa-route"></i>
+                    <span class="label">Zaplanuj trasę <span class="new-badge" id="newBadge" style="display:none;">NOWE</span></span>
+                </a>
+                <a href="pojazdy.html" class="grid-item" id="vehicleListMenuItem">
+                    <i class="fas fa-bus icon"></i>
+                    <span class="label">Lista Pojazdów <span class="new-badge" id="newBadge" style="display:none;">NOWE</span></span>
+                </a>
+                <a href="alerts.html" class="grid-item">
+                    <i class="fas fa-bell icon"></i>
+                    <span class="label">Komunikaty</span>
+                </a>
+                <a href="about.html" class="grid-item">
+                    <i class="fas fa-info-circle icon"></i>
+                    <span class="label">O projekcie</span>
+                </a>
+                <a href="stats.html" class="grid-item">
+                    <i class="fas fa-chart-bar icon"></i>
+                    <span class="label">Statystyki</span>
+                </a>
+                <a href="cookies.html" class="grid-item">
+                    <i class="fas fa-cookie-bite icon"></i>
+                    <span class="label">Ciasteczka</span>
+                </a>
+                <a href="https://www.ztm.poznan.pl/pl/rozklad-jazdy/" class="grid-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-clock icon"></i>
+                    <span class="label">Rozkłady ZTM</span>
+                    <i class="fas fa-external-link-alt external-link-icon"></i>
+                </a>
+                <a href="#" class="grid-item" id="changelogBtn">
+                    <i class="fas fa-list icon"></i>
+                    <span class="label">Lista zmian</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="menu-section">
+            <h2><i class="fas fa-sliders-h"></i> Ustawienia</h2>
+            <div class="grid-menu">
+                <a href="#" class="grid-item" id="toggleStopsBtn" data-setting="stops">
+                    <i class="fas fa-eye icon"></i>
+                    <span class="label">Przystanki</span>
+                    <span class="status-indicator">Ładowanie...</span>
+                </a>
+                <a href="#" class="grid-item" id="toggleClusteringBtn" data-setting="clustering">
+                    <i class="fas fa-object-group icon"></i>
+                    <span class="label">Grupowanie</span>
+                    <span class="status-indicator">Ładowanie...</span>
+                </a>
+                <a href="#" class="grid-item" id="toggleMarkerStyleBtn" data-setting="markerStyle">
+                    <i class="fas fa-bus icon"></i>
+                    <span class="label">Ikony pojazdów</span>
+                    <span class="status-indicator">Ładowanie...</span>
+                </a>
+                <a href="#" class="grid-item" id="toggleThemeBtn" data-setting="theme">
+                    <i class="fas fa-sun icon"></i>
+                    <span class="label">Motyw</span>
+                    <span class="status-indicator">Ładowanie...</span>
+                </a>
+                <a href="#" class="grid-item" id="toggleTimeFormatBtn" data-setting="timeFormat">
+                    <i class="fas fa-clock icon"></i>
+                    <span class="label">Format MM:SS</span>
+                    <span class="status-indicator">Ładowanie...</span>
+                </a>
+                <a href="#" class="grid-item" id="customizeLineColorBtn">
+                    <i class="fas fa-palette icon"></i>
+                    <span class="label">Kolor trasy</span>
+                </a>
+                <a href="#" class="grid-item" id="customizeTrailColorBtn">
+                    <i class="fas fa-route icon"></i>
+                    <span class="label">Kolor śladu</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="menu-section">
+            <h2><i class="fas fa-heart"></i> Społeczność</h2>
+            <div class="grid-menu">
+                <a href="https://www.facebook.com/TwojaTrasa/" class="grid-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-facebook icon"></i>
+                    <span class="label">Facebook</span>
+                    <i class="fas fa-external-link-alt external-link-icon"></i>
+                </a>
+                <a href="https://discord.gg/tWRdJDRBX3" class="grid-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-discord icon"></i>
+                    <span class="label">Discord</span>
+                    <i class="fas fa-external-link-alt external-link-icon"></i>
+                </a>
+                <a href="https://buycoffee.to/krystianandrzejewski" class="grid-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-mug-hot icon"></i>
+                    <span class="label">Wesprzyj</span>
+                    <i class="fas fa-external-link-alt external-link-icon"></i>
+                </a>
+            </div>
+        </section>
+
+        <div class="footer-note">
+             TwojaTrasa.online &copy; <span id="currentYear">2025</span>. Tworzone z pasją. | <a href="polityka-prywatnosci.html">Polityka Prywatności</a> | <a href="cookies.html">Ustawienia Cookies</a>
+        </div>
+
+    </div>
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <div id="changelogModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Lista zmian – <span id="changelogDate">20.05.2025</span></h2>
+            <ul>
+                <!-- Usunięto wpis o "Jak korzystać?" -->
+                <li>Dodano link "Lista Pojazdów" do sekcji Nawigacja w menu.</li>
+            </ul>
+            <div class="modal-footer">
+                <p>Pełną listę zmian znajdziesz na naszym Discordzie:
+                    <a href="https://discord.TwojaTrasa.online" target="_blank" rel="noopener noreferrer">Discord.TwojaTrasa.online</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="lineColorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Wybierz kolor trasy</h2>
+            <input type="color" id="lineColorPicker" value="#8A2BE2" style="width: 100%; height: 50px; border: none; cursor: pointer; margin: 20px 0;">
+            <button id="saveLineColorBtn" class="popup-button" style="margin-top: 15px;">Zapisz</button>
+        </div>
+    </div>
+
+    <div id="trailColorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Wybierz kolor śladu</h2>
+            <input type="color" id="trailColorPicker" value="#0000FF" style="width: 100%; height: 50px; border: none; cursor: pointer; margin: 20px 0;">
+            <button id="saveTrailColorBtn" class="popup-button" style="margin-top: 15px;">Zapisz</button>
+        </div>
+    </div>
+
+    <script>
+        // --- JS Zmodyfikowany dla nowego układu ---
+
+        // Klucze LocalStorage
+        const themeKey = 'theme';
+        const stopsKey = 'stopsVisible';
+        const clusteringKey = 'farZoomClusteringEnabled';
+        const markerStyleKey = 'vehicleMarkerStyle';
+        const consentKey = 'cookieConsent';
+        const timeFormatKey = 'timeFormatEnabled';
+
+        let currentTheme = 'dark';
+        let areStopsVisible = true;
+        let isFarZoomClusteringEnabled = true;
+        let currentMarkerStyle = 'icon';
+        let analyticsConsentGiven = false;
+        let isTimeFormatEnabled = true;
+
+        let toggleStopsElement, toggleClusteringElement, toggleMarkerStyleElement, toggleThemeElement, toggleTimeFormatElement;
+
+        function applyTheme(theme) { document.body.setAttribute('data-theme', theme); }
+
+        function updateStopToggleUI() {
+            if (!toggleStopsElement) return;
+            const icon = toggleStopsElement.querySelector('i.icon');
+            const status = toggleStopsElement.querySelector('.status-indicator');
+            if (!icon || !status) return;
+            icon.className = areStopsVisible ? 'fas fa-eye icon' : 'fas fa-eye-slash icon';
+            status.textContent = areStopsVisible ? 'Widoczne' : 'Ukryte';
+            toggleStopsElement.setAttribute('data-state', areStopsVisible ? 'on' : 'off');
+        }
+        function updateThemeToggleUI() {
+            if (!toggleThemeElement) return;
+            const icon = toggleThemeElement.querySelector('i.icon');
+            const status = toggleThemeElement.querySelector('.status-indicator');
+            if (!icon || !status) return;
+            icon.className = currentTheme === 'light' ? 'fas fa-moon icon' : 'fas fa-sun icon';
+            status.textContent = currentTheme === 'light' ? 'Jasny' : 'Ciemny';
+            toggleThemeElement.setAttribute('data-state', currentTheme);
+        }
+        function updateClusteringToggleUI() {
+            if (!toggleClusteringElement) return;
+            const icon = toggleClusteringElement.querySelector('i.icon');
+            const status = toggleClusteringElement.querySelector('.status-indicator');
+            if (!icon || !status) return;
+            icon.className = isFarZoomClusteringEnabled ? 'fas fa-object-group icon' : 'fas fa-th icon';
+            status.textContent = isFarZoomClusteringEnabled ? 'Włączone' : 'Wyłączone';
+            toggleClusteringElement.setAttribute('data-state', isFarZoomClusteringEnabled ? 'on' : 'off');
+        }
+        function updateMarkerStyleToggleUI() {
+            if (!toggleMarkerStyleElement) return;
+            const icon = toggleMarkerStyleElement.querySelector('i.icon');
+            const status = toggleMarkerStyleElement.querySelector('.status-indicator');
+            if (!icon || !status) return;
+            icon.className = currentMarkerStyle === 'icon' ? 'fas fa-bus icon' : 'fas fa-circle icon';
+            status.textContent = currentMarkerStyle === 'icon' ? 'Ikona' : 'Kropka';
+            toggleMarkerStyleElement.setAttribute('data-state', currentMarkerStyle);
+        }
+        function updateTimeFormatToggleUI() {
+            if (!toggleTimeFormatElement) return;
+            const icon = toggleTimeFormatElement.querySelector('i.icon');
+            const status = toggleTimeFormatElement.querySelector('.status-indicator');
+            if (!icon || !status) return;
+            icon.className = isTimeFormatEnabled ? 'fas fa-clock icon' : 'fas fa-times-circle icon';
+            status.textContent = isTimeFormatEnabled ? 'Włączony' : 'Wyłączony';
+            toggleTimeFormatElement.setAttribute('data-state', isTimeFormatEnabled ? 'on' : 'off');
+        }
+
+        function showNotification(type, message, duration = 3000) {
+            const cont = document.getElementById('notificationContainer');
+            if (!cont) return;
+            const div = document.createElement('div');
+            div.className = `notification ${type}`;
+            let iconClass = '';
+            switch(type){
+                case 'info': iconClass='info-circle'; break;
+                case 'error': iconClass='times-circle'; break;
+                default: iconClass='check-circle'; break;
+            }
+            div.innerHTML = `<i class="fas fa-${iconClass} icon"></i><span>${message}</span><button class="close-btn" onclick="this.parentElement.remove()">✕</button>`;
+            cont.prepend(div);
+            if(duration>0) setTimeout(()=>{
+                if(div.parentElement){
+                    div.style.opacity='0';
+                    div.style.transform='translateY(10px)';
+                    setTimeout(()=>div.remove(),500);
+                }
+            }, duration);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleStopsElement = document.querySelector('.grid-item[data-setting="stops"]');
+            toggleClusteringElement = document.querySelector('.grid-item[data-setting="clustering"]');
+            toggleMarkerStyleElement = document.querySelector('.grid-item[data-setting="markerStyle"]');
+            toggleThemeElement = document.querySelector('.grid-item[data-setting="theme"]');
+            toggleTimeFormatElement = document.querySelector('.grid-item[data-setting="timeFormat"]');
+
+            try {
+                const savedConsent = localStorage.getItem(consentKey);
+                if (savedConsent) {
+                    const consent = JSON.parse(savedConsent);
+                    analyticsConsentGiven = consent.analytics === true;
+                } else {
+                    analyticsConsentGiven = false;
+                }
+
+                const savedTheme = localStorage.getItem(themeKey);
+                currentTheme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
+                applyTheme(currentTheme);
+                updateThemeToggleUI();
+
+                const savedStops = localStorage.getItem(stopsKey);
+                areStopsVisible = (savedStops === null) ? true : (savedStops === 'true');
+                updateStopToggleUI();
+
+                const savedClustering = localStorage.getItem(clusteringKey);
+                isFarZoomClusteringEnabled = (savedClustering === null) ? true : (savedClustering === 'true');
+                updateClusteringToggleUI();
+
+                const savedMarkerStyle = localStorage.getItem(markerStyleKey);
+                currentMarkerStyle = (savedMarkerStyle === 'icon' || savedMarkerStyle === 'dot') ? savedMarkerStyle : 'icon';
+                updateMarkerStyleToggleUI();
+
+                const savedTimeFormat = localStorage.getItem(timeFormatKey);
+                isTimeFormatEnabled = (savedTimeFormat === null) ? true : (savedTimeFormat === 'true');
+                updateTimeFormatToggleUI();
+
+                if (analyticsConsentGiven) {
+                    gtag('config', 'G-N9G560TT5P');
+                }
+
+                const yearSpan = document.getElementById('currentYear');
+                if(yearSpan) {
+                    const currentFullYear = new Date().getFullYear();
+                    yearSpan.textContent = currentFullYear > 2024 ? `2024-${currentFullYear}` : currentFullYear;
+                }
+
+                // POKAŻ "NOWE" przy "Lista Pojazdów" do 20.06.2025
+                const newBadge = document.getElementById('newBadge');
+                if (newBadge) {
+                    const today = new Date();
+                    const endDate = new Date(2025, 5, 20); // miesiące od 0, więc 5 = czerwiec
+                    if (today <= endDate) {
+                        newBadge.style.display = 'inline-block';
+                    } else {
+                        newBadge.style.display = 'none';
+                    }
+                }
+
+            } catch (e) {
+                console.error("Błąd wczytywania ustawień z LocalStorage:", e);
+                showNotification('error', 'Nie udało się wczytać zapisanych ustawień.');
+                applyTheme(currentTheme);
+                updateThemeToggleUI();
+                updateStopToggleUI();
+                updateClusteringToggleUI();
+                updateMarkerStyleToggleUI();
+                updateTimeFormatToggleUI();
+                const yearSpan = document.getElementById('currentYear');
+                if(yearSpan) { const y = new Date().getFullYear(); yearSpan.textContent = y > 2024 ? `2024-${y}` : y; }
+            }
+
+            if (toggleStopsElement) {
+                toggleStopsElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        areStopsVisible = !areStopsVisible;
+                        localStorage.setItem(stopsKey, areStopsVisible.toString());
+                        updateStopToggleUI();
+                        showNotification('info', `Przystanki: ${areStopsVisible ? 'Widoczne' : 'Ukryte'}. Odśwież mapę.`);
+                    } catch (err) { console.error(err); showNotification('error','Błąd zapisu'); areStopsVisible = !areStopsVisible; updateStopToggleUI();}
+                });
+            }
+            if (toggleThemeElement) {
+                toggleThemeElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+                        localStorage.setItem(themeKey, currentTheme);
+                        applyTheme(currentTheme);
+                        updateThemeToggleUI();
+                        showNotification('info', `Motyw: ${currentTheme === 'light' ? 'Jasny' : 'Ciemny'}.`);
+                    } catch (err) { console.error(err); showNotification('error','Błąd zapisu'); currentTheme = (currentTheme === 'light') ? 'dark' : 'light'; applyTheme(currentTheme); updateThemeToggleUI();}
+                });
+            }
+            if (toggleClusteringElement) {
+                toggleClusteringElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        isFarZoomClusteringEnabled = !isFarZoomClusteringEnabled;
+                        localStorage.setItem(clusteringKey, isFarZoomClusteringEnabled.toString());
+                        updateClusteringToggleUI();
+                        showNotification('info', `Grupowanie: ${isFarZoomClusteringEnabled ? 'Włączone' : 'Wyłączone'}. Odśwież mapę.`);
+                    } catch (err) { console.error(err); showNotification('error','Błąd zapisu'); isFarZoomClusteringEnabled = !isFarZoomClusteringEnabled; updateClusteringToggleUI();}
+                });
+            }
+            if (toggleMarkerStyleElement) {
+                toggleMarkerStyleElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        currentMarkerStyle = (currentMarkerStyle === 'icon') ? 'dot' : 'icon';
+                        localStorage.setItem(markerStyleKey, currentMarkerStyle);
+                        updateMarkerStyleToggleUI();
+                        showNotification('info', `Ikony pojazdów: ${currentMarkerStyle === 'icon' ? 'Ikona' : 'Kropka'}. Odśwież mapę.`);
+                    } catch (err) { console.error(err); showNotification('error','Błąd zapisu'); currentMarkerStyle = (currentMarkerStyle === 'icon') ? 'dot' : 'icon'; updateMarkerStyleToggleUI(); }
+                });
+            }
+            if (toggleTimeFormatElement) {
+                toggleTimeFormatElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    try {
+                        isTimeFormatEnabled = !isTimeFormatEnabled;
+                        localStorage.setItem(timeFormatKey, isTimeFormatEnabled.toString());
+                        updateTimeFormatToggleUI();
+                        showNotification('info', `Format MM:SS: ${isTimeFormatEnabled ? 'Włączony' : 'Wyłączony'}.`);
+                    } catch (err) {
+                        console.error(err);
+                        showNotification('error', 'Błąd zapisu ustawienia.');
+                        isTimeFormatEnabled = !isTimeFormatEnabled;
+                        updateTimeFormatToggleUI();
+                    }
+                });
+            }
+
+            document.querySelectorAll('.grid-item.dropdown').forEach(dropdown => {
+                dropdown.addEventListener('click', (e) => {
+                    console.log('Kliknięto w menu filtrowania pojazdów.');
+                });
+            });
+
+            const changelogBtn = document.getElementById('changelogBtn');
+            const changelogModal = document.getElementById('changelogModal');
+            const closeBtn = changelogModal.querySelector('.close-btn');
+
+            changelogBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                changelogModal.style.display = 'block';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                changelogModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === changelogModal) {
+                    changelogModal.style.display = 'none';
+                }
+            });
+
+            const changelogCloseBtn = changelogModal.querySelector('.close-btn');
+            changelogCloseBtn.addEventListener('click', () => {
+                changelogModal.style.display = 'none';
+            });
+
+            const customizeLineColorBtn = document.getElementById('customizeLineColorBtn');
+            const lineColorModal = document.getElementById('lineColorModal');
+            const lineColorCloseBtn = lineColorModal.querySelector('.close-btn');
+            const saveLineColorBtn = document.getElementById('saveLineColorBtn');
+            const lineColorPicker = document.getElementById('lineColorPicker');
+
+            const lineColorKey = 'lineColor';
+
+            const loadLineColor = () => {
+                const savedColor = localStorage.getItem(lineColorKey) || '#8A2BE2';
+                lineColorPicker.value = savedColor;
+            };
+
+            const saveLineColor = () => {
+                const selectedColor = lineColorPicker.value;
+                localStorage.setItem(lineColorKey, selectedColor);
+                alert('Kolor trasy został zapisany!');
+            };
+
+            customizeLineColorBtn.addEventListener('click', () => {
+                loadLineColor();
+                lineColorModal.style.display = 'block';
+            });
+
+            lineColorCloseBtn.addEventListener('click', () => {
+                lineColorModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === lineColorModal) {
+                    lineColorModal.style.display = 'none';
+                }
+            });
+
+            saveLineColorBtn.addEventListener('click', () => {
+                saveLineColor();
+                lineColorModal.style.display = 'none';
+            });
+
+            const customizeTrailColorBtn = document.getElementById('customizeTrailColorBtn');
+            const trailColorModal = document.getElementById('trailColorModal');
+            const closeBtn2 = trailColorModal.querySelector('.close-btn');
+            const saveTrailColorBtn = document.getElementById('saveTrailColorBtn');
+            const trailColorPicker = document.getElementById('trailColorPicker');
+
+            const trailColorKey = 'trailColor';
+
+            const loadTrailColor = () => {
+                const savedColor = localStorage.getItem(trailColorKey) || '#0000FF';
+                trailColorPicker.value = savedColor;
+            };
+
+            const saveTrailColor = () => {
+                const selectedColor = trailColorPicker.value;
+                localStorage.setItem(trailColorKey, selectedColor);
+                alert('Kolor śladu został zapisany!');
+            };
+
+            customizeTrailColorBtn.addEventListener('click', () => {
+                loadTrailColor();
+                trailColorModal.style.display = 'block';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                trailColorModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === trailColorModal) {
+                    trailColorModal.style.display = 'none';
+                }
+            });
+
+            const trailColorCloseBtn = trailColorModal.querySelector('.close-btn');
+            trailColorCloseBtn.addEventListener('click', () => {
+                trailColorModal.style.display = 'none';
+            });
+
+            saveTrailColorBtn.addEventListener('click', () => {
+                saveTrailColor();
+                trailColorModal.style.display = 'none';
+            });
+        });
+
+        function sendFilterMessage(type) {
+            try {
+                const filterData = { action: 'filterVehicles', vehicleType: type };
+                localStorage.setItem('filterVehicles', JSON.stringify(filterData));
+                showNotification('info', `Wybrano filtr: ${type === 'tram' ? 'Tramwaje' : type === 'bus' ? 'Autobusy' : 'Wszystkie'}`);
+            } catch (e) {
+                showNotification('error', 'Nie udało się zapisać filtra.');
+            }
+        }
+    </script>
+
+</body>
+</html>

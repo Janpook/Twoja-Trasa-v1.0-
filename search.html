@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyniki wyszukiwania - TwojaTrasa.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+	        /* --- Opcja 2: Logo z ikoną pinezki --- */
+        .logo-option-2 {
+            display: flex; /* Ustawia ikonę i tekst w jednej linii */
+            align-items: center; /* Wyśrodkowuje ikonę i tekst pionowo */
+        }
+
+        .logo-option-2 .logo-icon {
+            margin-right: 8px; /* Odstęp między ikoną a tekstem */
+            font-size: 1.2em; /* Lekko powiększona ikona */
+            color: var(--accent); /* Kolor ikony dopasowany do akcentu */
+            line-height: 1; /* Zapobiega problemom z wysokością linii */
+        }
+
+        /* Zachowujemy oryginalne podświetlenie 'Trasa' */
+        .logo-option-2 span {
+           color: var(--accent);
+        }
+        /* --- Koniec Opcji 2 --- */
+        /* --- CSS (Minimalistyczny / Dark / MPK - Taki jak w poprzedniej odpowiedzi) --- */
+        :root {
+            --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333;
+            --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b;
+            --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00;
+            --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px;
+            --border-radius: 4px; --transition: all 0.2s ease-in-out;
+        }
+        body[data-theme="light"] {
+            --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee;
+            --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd;
+            --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00;
+            --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; transition: var(--transition); padding-top: 55px; /* Miejsce na top-bar */ }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul, ol { list-style: none; }
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .top-bar .logo span { color: var(--accent); }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+        .top-bar .back-link:hover { color: var(--accent-hover); }
+
+        /* --- Główny kontener dla podstron --- */
+        .container { max-width: 900px; margin: 20px auto; padding: 20px; }
+
+        /* --- Style specyficzne dla search.html --- */
+        .container h1 { font-size: calc(var(--font-size-large) + 2px); font-weight: 500; margin-bottom: 25px; color: var(--text-secondary); }
+        .container h1 span { color: var(--text-primary); font-weight: 600; }
+
+        h3 {
+            font-size: var(--font-size-large);
+            margin: 30px 0 15px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h3 i { color: var(--accent); }
+
+        ul { list-style: none; padding: 0; }
+        li.result-item {
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            margin-bottom: 8px;
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+        li.result-item:hover { background-color: var(--bg-tertiary); border-color: var(--accent); }
+        li.result-item > span:first-child {
+            flex-grow: 1;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+         li.result-item > span:first-child .icon {
+             color: var(--text-secondary);
+             font-size: 1.1em;
+             width: 1.2em;
+             text-align: center;
+         }
+        .result-links {
+            flex-shrink: 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .result-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: var(--font-size-small);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: var(--border-radius);
+        }
+        .result-links a:hover {
+            color: var(--accent-hover);
+            background-color: var(--bg-primary);
+            text-decoration: none;
+        }
+
+        /* --- Style dla "Ostatnio Widziany" --- */
+        #recentlySeenSection {
+             margin-top: 30px;
+        }
+        #recentlySeenSection h3 {
+            /* Style dziedziczone */
+        }
+        #recentlySeenList li.result-item {
+             /* Style dziedziczone */
+         }
+         #recentlySeenList li.no-results {
+            /* Style dziedziczone */
+         }
+
+        .gps-history {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+         }
+        .gps-history.active { display: block; }
+        .gps-map {
+            height: 200px;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+         }
+         li.no-results {
+             padding: 12px 15px;
+             color: var(--text-secondary);
+             text-align: center;
+             font-style: italic;
+             background: none;
+             border: 1px dashed var(--border-color);
+             border-radius: var(--border-radius);
+         }
+
+         /* Media Queries */
+         @media (max-width: 768px) {
+            :root { --font-size-base: 13px; --font-size-small: 11px; --font-size-large: 15px; }
+            .top-bar { height: 50px; padding: 0 10px; }
+            .top-bar .logo { font-size: 18px; }
+            .top-bar .back-link { font-size: var(--font-size-base); }
+            body { padding-top: 50px; }
+            .container { margin: 15px; padding: 15px; }
+            .container h1 { font-size: 16px; }
+            h3 { font-size: var(--font-size-large); margin-top: 25px; }
+            li.result-item { padding: 10px; flex-direction: column; align-items: flex-start; gap: 8px; }
+            .result-links { margin-top: 8px; width: 100%; justify-content: flex-start; gap: 15px; }
+            .result-links a { padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span>Trasa</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+            <a href="menu.html" class="back-link"><i class="fas fa-bars"></i> Menu</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Wyniki dla: "<span id="searchQuery"></span>"</h1>
+
+        <div id="searchResults">
+            <h3><i class="fas fa-route"></i> Linie</h3>
+            <ul id="linesList"><li class="no-results">Ładowanie...</li></ul>
+
+            <h3><i class="fas fa-bus"></i> Pojazdy</h3>
+            <ul id="taborList"><li class="no-results">Ładowanie...</li></ul>
+
+            <h3><i class="fas fa-map-pin"></i> Przystanki</h3>
+            <ul id="stopsList"><li class="no-results">Ładowanie...</li></ul>
+
+            <div id="recentlySeenSection" style="display: none;">
+                <h3><i class="fas fa-history"></i> Ostatnio Widziany</h3>
+                <ul id="recentlySeenList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        function applyTheme(theme) { document.body.setAttribute('data-theme', theme); }
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentTheme = 'dark'; try { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark' || savedTheme === 'light') { currentTheme = savedTheme; } } catch (e) {} applyTheme(currentTheme);
+            displayResults();
+        });
+
+        const maps = {};
+
+        async function fetchGpsHistory(taborNumber) { try { const response = await fetch('history.txt'); if (!response.ok) { console.warn(`Nie można pobrać history.txt: ${response.status}`); return []; } const text = await response.text(); return text.split('\n').filter(line => line.trim() !== '' && line.startsWith(taborNumber + ',')).map(line => { const [, lat, lon, ts] = line.split(','); return { lat: parseFloat(lat), lon: parseFloat(lon), timestamp: ts }; }).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); } catch (error) { console.error('Błąd pobierania historii GPS:', error); return []; } }
+
+        function displayResults() {
+            const results = JSON.parse(localStorage.getItem('searchResults')) || { lines: [], tabor: [], stops: [] };
+            const query = localStorage.getItem('searchQuery') || '';
+            document.getElementById('searchQuery').textContent = query;
+
+            const linesList = document.getElementById('linesList');
+            const taborList = document.getElementById('taborList');
+            const stopsList = document.getElementById('stopsList');
+            const recentlySeenSection = document.getElementById('recentlySeenSection');
+            const recentlySeenList = document.getElementById('recentlySeenList');
+
+            // Wypełnianie list (bez zmian)
+            linesList.innerHTML = results.lines.length > 0 ? results.lines.map(line => `<li class="result-item"><span><span class="icon"><i class="fas fa-route"></i></span> Linia <strong>${line.routeId}</strong> (kier.: ${line.headsign})</span></li>`).join('') : '<li class="no-results">Brak wyników dla linii.</li>';
+            taborList.innerHTML = results.tabor.length > 0 ? results.tabor.map((tabor, index) => `<li class="result-item"><span><span class="icon"><i class="fas fa-bus"></i></span> Nr <strong>${tabor.taborNumber}</strong> (L: ${tabor.line}, kier.: ${tabor.destination})</span><div class="result-links"><a href="index.html?pojazd=${tabor.taborNumber}" title="Pokaż GPS"><i class="fas fa-map-marker-alt"></i> GPS</a><a href="#" onclick="toggleGpsHistory(${index}, '${tabor.taborNumber}'); return false;" title="Historia GPS"><i class="fas fa-history"></i> Historia</a></div></li><div id="gps-history-${index}" class="gps-history"><div id="gps-map-${index}" class="gps-map">Ładowanie mapy...</div></div>`).join('') : '<li class="no-results">Brak wyników dla pojazdów.</li>';
+            stopsList.innerHTML = results.stops.length > 0 ? results.stops.map(stop => `<li class="result-item"><span><span class="icon"><i class="fas fa-map-pin"></i></span> ${stop.name} (ID: ${stop.stopId}${stop.code ? ', Kod: '+stop.code : ''})</span><div class="result-links"><a href="index.html?przystanek=${stop.stopId}" title="Pokaż na mapie"><i class="fas fa-map-marked-alt"></i> Mapa</a></div></li>`).join('') : '<li class="no-results">Brak wyników dla przystanków.</li>';
+
+            // --- Logika wyświetlania sekcji "Ostatnio widziany" Z DODATKOWYM LOGOWANIEM ---
+            const taborNumberQuery = query.trim();
+            console.log(`[Search Debug] Query: '${taborNumberQuery}'`); // Log 1: Szukana fraza
+
+            const isQueryNumeric = taborNumberQuery && !isNaN(taborNumberQuery);
+            console.log(`[Search Debug] Is query numeric? ${isQueryNumeric}`); // Log 2: Czy fraza jest liczbą?
+
+            const activeTaborNumbers = results.tabor.map(t => t.taborNumber); // Numery aktywnych pojazdów
+            console.log(`[Search Debug] Active vehicle numbers:`, activeTaborNumbers); // Log 3: Aktywne numery
+
+            const isVehicleOnline = activeTaborNumbers.includes(taborNumberQuery);
+            console.log(`[Search Debug] Is vehicle ${taborNumberQuery} online (in active results)? ${isVehicleOnline}`); // Log 4: Czy znaleziono online?
+
+            // Warunek: Szukana fraza jest liczbą ORAZ NIE MA jej w aktywnych wynikach taboru
+            const shouldShowRecentlySeen = isQueryNumeric && !isVehicleOnline;
+            console.log(`[Search Debug] Should show 'Recently Seen' section? ${shouldShowRecentlySeen}`); // Log 5: Czy warunek jest spełniony?
+
+            if (shouldShowRecentlySeen) {
+                 console.log(`[Search Debug] CONDITION MET: Showing 'Ostatnio widziany' for ${taborNumberQuery}.`);
+                 if (recentlySeenSection) {
+                     recentlySeenSection.style.display = 'block'; // Pokaż sekcję
+                     loadRecentlySeen(taborNumberQuery);           // Załaduj historię
+                 } else {
+                      console.error("[Search Debug] Error: recentlySeenSection element not found!");
+                 }
+            } else {
+                 console.log(`[Search Debug] CONDITION NOT MET: Hiding 'Ostatnio widziany'.`);
+                 if (recentlySeenSection) {
+                    recentlySeenSection.style.display = 'none';  // Ukryj sekcję
+                 } else {
+                    // To nie jest błąd, jeśli sekcja po prostu nie istnieje w HTML (chociaż powinna)
+                    // console.warn("[Search Debug] Warning: recentlySeenSection element not found (when trying to hide).");
+                 }
+            }
+            // --- Koniec logiki "Ostatnio widziany" ---
+        }
+
+        async function loadRecentlySeen(taborNumber) {
+             const recentlySeenList = document.getElementById('recentlySeenList');
+             if (!recentlySeenList) { console.error("[Search Debug] Error: recentlySeenList element not found!"); return; } // Dodano sprawdzenie
+             recentlySeenList.innerHTML = `<li class="no-results">Sprawdzanie historii dla ${taborNumber}...</li>`;
+             console.log(`[Search Debug] Fetching history for ${taborNumber}...`);
+             const gpsHistory = await fetchGpsHistory(taborNumber);
+             console.log(`[Search Debug] History for ${taborNumber}:`, gpsHistory); // Log pobranej historii
+             if (gpsHistory.length === 0) {
+                 recentlySeenList.innerHTML = `<li class="no-results">Brak zapisanej historii GPS dla ${taborNumber}.</li>`;
+                 return;
+             }
+             const lastPoint = gpsHistory[gpsHistory.length - 1];
+             recentlySeenList.innerHTML = `
+                <li class="result-item">
+                    <span><span class="icon"><i class="fas fa-bus"></i></span> Nr <strong>${taborNumber}</strong> (Offline)
+                         <br><small style="color: var(--text-secondary); margin-left: 2.2em;">Ostatni sygnał: ${lastPoint.timestamp || '?'} (${lastPoint.lat.toFixed(5)}, ${lastPoint.lon.toFixed(5)})</small>
+                    </span>
+                    <div class="result-links">
+                        <a href="#" onclick="toggleGpsHistoryRecent(0, '${taborNumber}'); return false;" title="Pokaż trasę"><i class="fas fa-history"></i> Pokaż trasę</a>
+                    </div>
+                </li>
+                <div id="gps-history-recent-0" class="gps-history"><div id="gps-map-recent-0" class="gps-map">Ładowanie mapy...</div></div>`;
+        }
+
+        async function toggleGpsHistory(index, taborNumber) { await loadMapForHistory(`tabor-${index}`, `gps-history-${index}`, `gps-map-${index}`, taborNumber); }
+        async function toggleGpsHistoryRecent(index, taborNumber) { await loadMapForHistory(`recent-${index}`, `gps-history-recent-${index}`, `gps-map-recent-${index}`, taborNumber); }
+
+        async function loadMapForHistory(mapKey, historyDivId, mapDivId, taborNumber) {
+            const historyDiv = document.getElementById(historyDivId);
+            if (!historyDiv) return;
+            const isActive = historyDiv.classList.toggle('active');
+            const mapContainer = document.getElementById(mapDivId);
+             if (!mapContainer) return;
+
+            if (isActive && !maps[mapKey]) {
+                 mapContainer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ładowanie historii...';
+                 const gpsHistory = await fetchGpsHistory(taborNumber);
+                 if (gpsHistory.length === 0) { mapContainer.innerHTML = 'Brak historii GPS.'; return; }
+
+                 mapContainer.innerHTML = '';
+                 const tileUrl = document.body.getAttribute('data-theme') === 'dark' ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                 const tileAttribution = document.body.getAttribute('data-theme') === 'dark' ? '&copy; OSM &copy; CARTO' : '&copy; OSM';
+                 const map = L.map(mapDivId).setView([gpsHistory[0].lat, gpsHistory[0].lon], 13);
+                 L.tileLayer(tileUrl, { attribution: tileAttribution }).addTo(map);
+
+                 const latlngs = gpsHistory.map(p => [p.lat, p.lon]);
+                 L.polyline(latlngs, { color: 'var(--accent)', weight: 3 }).addTo(map);
+                 L.marker(latlngs[0], { opacity: 0.7 }).addTo(map).bindPopup(`Start: ${gpsHistory[0].timestamp || '?'}`);
+                 L.marker(latlngs[latlngs.length - 1]).addTo(map).bindPopup(`Koniec: ${gpsHistory[latlngs.length - 1].timestamp || '?'}`);
+                 maps[mapKey] = map;
+                 setTimeout(() => { map.invalidateSize(); map.fitBounds(latlngs, {padding: [10, 10]}); }, 100);
+            } else if (isActive && maps[mapKey]) {
+                 setTimeout(() => maps[mapKey].invalidateSize(), 100);
+            }
+        }
+    </script>
+</body>
+</html>

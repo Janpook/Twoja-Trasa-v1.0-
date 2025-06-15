@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-N9G560TT5P');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statystyki Systemu - TwojaTrasa.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.4.0/dist/protobuf.min.js" defer></script>
+    <style>
+        /* --- SKOPIOWANY CAŁY BLOK CSS Z INDEX.HTML (Minimalistyczny / Dark / MPK) --- */
+        :root {
+            --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333;
+            --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b;
+            --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00;
+            --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px;
+            --border-radius: 4px; --transition: all 0.2s ease-in-out;
+            /* Dodatkowe kolory dla statusów */
+            --danger-color: #f44336; --warning-color: #ff9800; --ok-color: var(--accent); /* OK używa akcentu */
+        }
+        body[data-theme="light"] {
+            --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee;
+            --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd;
+            --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00;
+            --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1);
+             --danger-color: #e53935; --warning-color: #fb8c00; --ok-color: var(--accent);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; transition: var(--transition); padding-top: 55px; /* Miejsce na top-bar */ }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul, ol { list-style: none; }
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .top-bar .logo span { color: var(--accent); }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+        .top-bar .back-link:hover { color: var(--accent-hover); }
+
+        /* --- Główny kontener dla podstron --- */
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+
+        /* --- Style specyficzne dla stats.html --- */
+          .container h1 { font-size: calc(var(--font-size-large) + 4px); font-weight: 600; margin-bottom: 30px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+          .container h1 i { color: var(--accent); }
+
+        .section {
+            background: var(--bg-secondary);
+            padding: 20px; /* Mniejszy padding */
+            border-radius: var(--border-radius);
+            margin-bottom: 20px; /* Mniejszy odstęp */
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+           }
+        .section h2 {
+             font-size: var(--font-size-large); /* Zmniejszono */
+             margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+             color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+             font-weight: 500; /* Lżejszy nagłówek */
+           }
+        .section h2 i { font-size: 1em; color: var(--accent); } /* Ikona w kolorze akcentu */
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Mniejszy minmax */ gap: 12px; /* Mniejszy odstęp */ }
+        .stat-item { text-align: center; padding: 12px; background-color: var(--bg-primary); /* Tło inne niż sekcja */ border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+        .stat-item .label { font-size: var(--font-size-small); color: var(--text-secondary); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-item .value { font-size: var(--font-size-large); /* Mniejsza wartość */ font-weight: 600; color: var(--text-primary); } /* Wartość w głównym kolorze tekstu */
+        .stat-item .value.accent { color: var(--accent); } /* Specjalna klasa dla wartości z akcentem */
+        .stat-item .value.small { font-size: var(--font-size-base); } /* Mniejsza wartość */
+        .stat-item .details { font-size: calc(var(--font-size-small) - 1px); color: var(--text-tertiary); margin-top: 6px; }
+
+        .status-list { list-style: none; padding: 0; margin: 0; }
+        .status-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; /* Dopasowano padding */ border-bottom: 1px solid var(--border-color); transition: var(--transition); }
+        .status-list li:last-child { border-bottom: none; }
+        .status-list .status-label { display: flex; align-items: center; gap: 8px; font-size: var(--font-size-base); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0;}
+        .status-dot.ok { background-color: var(--ok-color); }
+        .status-dot.warning { background-color: var(--warning-color); }
+        .status-dot.error { background-color: var(--danger-color); }
+        .status-dot.unknown { background-color: var(--text-tertiary); }
+
+        .status-value { font-weight: 500; font-size: var(--font-size-base); text-align: right; transition: color 0.3s ease; }
+        .status-value.error-text { color: var(--danger-color); font-weight: 600; } /* Błąd ZTM */
+        .status-value.warning-text { color: var(--warning-color); font-weight: 500; } /* Ostrzeżenie (np. problem z odświeżaniem) */
+
+        .stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: var(--font-size-small); /* Mniejszy font w tabeli */ }
+        .stats-table th, .stats-table td { padding: 8px 10px; /* Mniejszy padding */ text-align: left; border-bottom: 1px solid var(--border-color); transition: var(--transition); }
+        .stats-table th { background-color: var(--bg-tertiary); font-weight: 500; /* Lżejszy nagłówek */ }
+        .stats-table td:last-child { text-align: right; font-weight: 500; }
+        .stats-table td .fa-bus, .stats-table td .fa-tram { color: var(--text-secondary); margin-right: 5px; } /* Ikony typów pojazdów */
+
+        .loading-text, .error-text { text-align: center; padding: 20px; color: var(--text-secondary); font-style: italic; }
+        .update-time { text-align: center; font-size: var(--font-size-small); color: var(--text-tertiary); margin-top: 30px; }
+        #debug-stale-info { color: var(--warning-color); font-weight: bold; margin-top: 15px; padding: 10px; border: 1px solid var(--warning-color); border-radius: var(--border-radius); text-align: center; font-size: var(--font-size-small); background-color: rgba(var(--warning-color-rgb, 255, 152, 0), 0.1); /* Wymaga zdefiniowania --warning-color-rgb */ }
+         :root { --warning-color-rgb: 255, 152, 0; } /* Definicja dla alpha() */
+         body[data-theme="light"] { --warning-color-rgb: 251, 140, 0; }
+
+        /* --- Opcja 2: Logo z ikoną pinezki --- */
+        .logo-option-2 {
+            display: flex; /* Ustawia ikonę i tekst w jednej linii */
+            align-items: center; /* Wyśrodkowuje ikonę i tekst pionowo */
+        }
+
+        .logo-option-2 .logo-icon {
+            margin-right: 8px; /* Odstęp między ikoną a tekstem */
+            font-size: 1.2em; /* Lekko powiększona ikona */
+            color: var(--accent); /* Kolor ikony dopasowany do akcentu */
+            line-height: 1; /* Zapobiega problemom z wysokością linii */
+        }
+
+        /* Zachowujemy oryginalne podświetlenie 'Trasa' */
+        .logo-option-2 span {
+           color: var(--accent);
+        }
+        /* --- Koniec Opcji 2 --- */
+
+          /* Media Queries */
+        @media (max-width: 768px) {
+             :root { --font-size-base: 13px; --font-size-small: 11px; --font-size-large: 15px; }
+             .top-bar { height: 50px; padding: 0 10px; }
+             .top-bar .logo { font-size: 18px; }
+             .top-bar .back-link { font-size: var(--font-size-base); }
+             body { padding-top: 50px; }
+             .container { margin: 15px; padding: 15px; }
+             .section { padding: 15px; }
+             .section h2 { font-size: 17px; /* Mniejszy nagłówek sekcji */ }
+             .stats-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+             .stat-item { padding: 10px; }
+             .stat-item .value { font-size: var(--font-size-large); }
+             .stat-item .value.small { font-size: var(--font-size-base); }
+             .stat-item .label { font-size: 10px; }
+             .stat-item .details { font-size: 9px; }
+             .stats-table { font-size: 11px; }
+             .stats-table th, .stats-table td { padding: 6px; }
+             .status-list .status-label { font-size: var(--font-size-base); }
+             .status-list .status-value { font-size: var(--font-size-base); }
+             #debug-stale-info { font-size: 11px; padding: 8px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+		<div class="logo logo-option-2">
+			<i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span> Trasa</span>
+		</div>
+        <div class="nav-links"> <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+            <a href="menu.html" class="back-link"><i class="fas fa-bars"></i> Menu</a> </div>
+    </div>
+
+    <div class="container">
+        <h1><i class="fas fa-chart-bar"></i> Statystyki Systemu</h1>
+
+        <div class="section">
+            <h2><i class="fas fa-tachometer-alt"></i> Podsumowanie</h2>
+            <div class="stats-grid">
+                <div class="stat-item"> <span class="label">Status Połączenia</span> <span class="value accent" id="connectionStatus">Ładowanie...</span> <span class="details" id="connectionDetails">-</span> </div>
+                <div class="stat-item"> <span class="label">Śledzone Pojazdy</span> <span class="value" id="totalVehicles">0</span> <span class="details">Aktywne</span> </div>
+                <div class="stat-item"> <span class="label">Tramwaje</span> <span class="value" id="tramCount">0</span> <span class="details">Online</span> </div>
+                <div class="stat-item"> <span class="label">Autobusy</span> <span class="value" id="busCount">0</span> <span class="details">Online</span> </div>
+                <div class="stat-item"> <span class="label">Aktywne Kursy</span> <span class="value" id="activeTrips">0</span> <span class="details">Unikalne</span> </div>
+                <div class="stat-item"> <span class="label">Aktywne Linie</span> <span class="value" id="activeRoutes">0</span> <span class="details">Unikalne</span> </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-traffic-light"></i> Status Pojazdów</h2>
+            <div class="stats-grid">
+                <div class="stat-item"> <span class="label">W trasie</span> <span class="value" id="statusInTransit">0</span> </div>
+                <div class="stat-item"> <span class="label">Na przystanku</span> <span class="value" id="statusAtStop">0</span> </div>
+                <div class="stat-item"> <span class="label">Dojeżdża</span> <span class="value" id="statusApproaching">0</span> </div>
+                <div class="stat-item"> <span class="label">Nieznany</span> <span class="value" id="statusUnknown">0</span> </div>
+                <div class="stat-item"> <span class="label">Bez kursu</span> <span class="value" id="vehiclesNoTrip">0</span> <span class="details">Nieprzypisane</span> </div>
+            </div>
+        </div>
+
+         <div class="section">
+            <h2><i class="fas fa-tachometer-alt"></i> Prędkość Pojazdów</h2>
+             <div class="stats-grid">
+                 <div class="stat-item"> <span class="label">Stojące</span> <span class="value" id="speedStopped">0</span> <span class="details">(0 km/h)</span> </div>
+                 <div class="stat-item"> <span class="label">Wolne</span> <span class="value" id="speedSlow">0</span> <span class="details">(1-10 km/h)</span> </div>
+                 <div class="stat-item"> <span class="label">Średnie</span> <span class="value" id="speedMedium">0</span> <span class="details">(11-40 km/h)</span> </div>
+                 <div class="stat-item"> <span class="label">Szybkie</span> <span class="value" id="speedFast">0</span> <span class="details">(>40 km/h)</span> </div>
+             </div>
+         </div>
+
+
+        <div class="section">
+            <h2><i class="fas fa-route"></i> Pojazdy na Liniach (TOP 10)</h2>
+             <div id="linesTableContainer">
+                 <p class="loading-text" id="linesLoading">Ładowanie danych...</p>
+             </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-database"></i> Jakość Danych</h2>
+             <div class="stats-grid">
+                 <div class="stat-item"> <span class="label">Ostatni Sygnał GPS</span> <span class="value small" id="latestUpdate">Brak</span> <span class="details">W danych ZTM</span> </div>
+                 <div class="stat-item"> <span class="label">Najstarszy Sygnał GPS</span> <span class="value small" id="oldestUpdate">Brak</span> <span class="details">W danych ZTM</span> </div>
+                 <div class="stat-item"> <span class="label">Średni Wiek Danych</span> <span class="value" id="avgDataAge">~ ? s</span> <span class="details">Od sygnału</span> </div>
+                 <div class="stat-item"> <span class="label">Czas Przetwarzania</span> <span class="value" id="processingTime">? ms</span> <span class="details">Interfejs</span> </div>
+             </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-heartbeat"></i> Status Komponentów</h2>
+            <ul class="status-list" id="componentStatusList">
+                 <li id="statusProxy"> <span class="status-label"> <span class="status-dot unknown"></span> Backend Proxy </span> <span class="status-value">-</span> </li>
+                 <li id="statusZtmApi"> <span class="status-label"> <span class="status-dot unknown"></span> Źródło ZTM (API) </span> <span class="status-value">-</span> </li>
+                 <li id="statusStaticData"> <span class="status-label"> <span class="status-dot ok"></span> Dane Statyczne </span> <span class="status-value">OK</span> </li>
+                 <li id="statusClientProcessing"> <span class="status-label"> <span class="status-dot unknown"></span> Przetwarzanie UI </span> <span class="status-value">-</span> </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-user-cog"></i> Ustawienia Lokalne</h2>
+             <div class="stats-grid">
+                 <div class="stat-item"> <span class="label">Ulubione Pojazdy</span> <span class="value" id="favVehicles">0</span> </div>
+                 <div class="stat-item"> <span class="label">Ulubione Przystanki</span> <span class="value" id="favStops">0</span> </div>
+                 <div class="stat-item"> <span class="label">Interwał</span> <span class="value" id="refreshInterval">? s</span> <span class="details">Odświeżanie</span> </div>
+             </div>
+        </div>
+
+        <div id="debug-stale-info" style="display: none;"></div> <div class="update-time" id="lastUpdateTime">Oczekiwanie na dane...</div>
+    </div>
+
+    <script>
+        // --- JS (Logika bez zmian, ale dostosuje się do nowego CSS) ---
+        const REFRESH_INTERVAL_SECONDS = 30;
+        const STALE_DATA_THRESHOLD_SECONDS = 300;
+
+        const elements = { /* ... (reszta ID bez zmian) ... */
+            connectionStatus: document.getElementById('connectionStatus'), connectionDetails: document.getElementById('connectionDetails'),
+            totalVehicles: document.getElementById('totalVehicles'), tramCount: document.getElementById('tramCount'), busCount: document.getElementById('busCount'),
+            activeTrips: document.getElementById('activeTrips'), activeRoutes: document.getElementById('activeRoutes'),
+            statusInTransit: document.getElementById('statusInTransit'), statusAtStop: document.getElementById('statusAtStop'), statusApproaching: document.getElementById('statusApproaching'),
+            statusUnknown: document.getElementById('statusUnknown'), speedStopped: document.getElementById('speedStopped'), speedSlow: document.getElementById('speedSlow'),
+            speedMedium: document.getElementById('speedMedium'), speedFast: document.getElementById('speedFast'), vehiclesNoTrip: document.getElementById('vehiclesNoTrip'),
+            linesTableContainer: document.getElementById('linesTableContainer'), linesLoading: document.getElementById('linesLoading'),
+            latestUpdate: document.getElementById('latestUpdate'), oldestUpdate: document.getElementById('oldestUpdate'), avgDataAge: document.getElementById('avgDataAge'),
+            processingTime: document.getElementById('processingTime'), statusProxy: document.getElementById('statusProxy')?.querySelector('.status-value'),
+            statusProxyDot: document.getElementById('statusProxy')?.querySelector('.status-dot'), statusZtmApi: document.getElementById('statusZtmApi')?.querySelector('.status-value'),
+            statusZtmApiDot: document.getElementById('statusZtmApi')?.querySelector('.status-dot'), statusClientProcessing: document.getElementById('statusClientProcessing')?.querySelector('.status-value'),
+            statusClientProcessingDot: document.getElementById('statusClientProcessing')?.querySelector('.status-dot'), favVehicles: document.getElementById('favVehicles'),
+            favStops: document.getElementById('favStops'), refreshInterval: document.getElementById('refreshInterval'), lastUpdateTime: document.getElementById('lastUpdateTime'),
+            debugStaleInfo: document.getElementById('debug-stale-info') };
+
+        for(const k in elements) if(!elements[k]) console.error(`[Init] Missing element: ${k}`);
+
+        const vehicleStatusMap = { 0: "Approaching", 1: "AtStop", 2: "InTransit", null: "Unknown", undefined: "Unknown" };
+        let lastFetchTime = null; let lastSuccessfulFetchTime = null;
+
+        function determineVehicleType(line, tabor) { const num = parseInt(line); return !isNaN(num) && num >= 0 && num <= 99 ? "tram" : "bus"; }
+        function formatTimestamp(ts) { return !ts || ts === Infinity ? "-" : new Date(ts * 1000).toLocaleString('pl-PL'); }
+        function calculateTimeDiff(ts) { return !ts ? Infinity : Math.max(0, Math.floor(Date.now()/1000) - ts); }
+        function updateStatusDot(el, status) { if(el) el.className = `status-dot ${status}`; }
+
+        function updateDisplay(msg) {
+             console.log("--- [updateDisplay] Start ---"); const start = performance.now(); const now = Date.now(); const nowTs = Math.floor(now/1000); lastSuccessfulFetchTime = now; const entities = msg?.entity?.filter(e => e.vehicle?.position) || [];
+             let trams=0, buses=0; const statuses={A:0, S:0, T:0, U:0}; const speeds={Stop:0, Slow:0, Med:0, Fast:0}; let noTrip=0; const lines=new Map(); const trips=new Set(); const routes=new Set(); let minTs=Infinity, maxTs=0; let ageSum=0, tsCount=0;
+
+             entities.forEach(e => { const v=e.vehicle; const rId=v.trip?.routeId; const tabor=v.vehicle?.id; const type=determineVehicleType(rId, tabor); type==='tram'?trams++:buses++; const statCode=v.currentStatus; const statName=vehicleStatusMap[statCode]; statuses[statName[0]]++; const speed=v.position.speed?(v.position.speed*3.6):0; if(speed===0)speeds.Stop++; else if(speed<=10)speeds.Slow++; else if(speed<=40)speeds.Med++; else speeds.Fast++; const tId=v.trip?.tripId; if(!tId)noTrip++; else trips.add(tId); if(rId)routes.add(rId); const lKey=rId||"?"; if(!lines.has(lKey))lines.set(lKey,{type:type,count:0}); lines.get(lKey).count++; const ts=v.timestamp?.low; if(ts){minTs=Math.min(minTs,ts); maxTs=Math.max(maxTs,ts); ageSum+=calculateTimeDiff(ts); tsCount++;} });
+             const total = entities.length;
+
+             elements.totalVehicles.textContent = total; elements.tramCount.textContent = trams; elements.busCount.textContent = buses;
+             elements.activeTrips.textContent = trips.size; elements.activeRoutes.textContent = routes.size;
+             elements.statusApproaching.textContent = statuses.A; elements.statusAtStop.textContent = statuses.S; elements.statusInTransit.textContent = statuses.T; elements.statusUnknown.textContent = statuses.U;
+             elements.speedStopped.textContent = speeds.Stop; elements.speedSlow.textContent = speeds.Slow; elements.speedMedium.textContent = speeds.Med; elements.speedFast.textContent = speeds.Fast;
+             elements.vehiclesNoTrip.textContent = noTrip; elements.linesLoading.style.display = 'none';
+             const sortedLines = Array.from(lines.entries()).sort(([,a],[,b])=>b.count-a.count).slice(0,10);
+             let linesHtml = '<table class="stats-table"><thead><tr><th>Typ</th><th>Linia</th><th>Pojazdy</th></tr></thead><tbody>';
+             if(sortedLines.length > 0) sortedLines.forEach(([l,d]) => {linesHtml+=`<tr><td><i class="fas ${d.type==='tram'?'fa-tram':'fa-bus'}"></i></td><td>${l}</td><td>${d.count}</td></tr>`;});
+             else linesHtml += '<tr><td colspan="3" style="text-align:center;">Brak</td></tr>';
+             linesHtml += '</tbody></table>'; elements.linesTableContainer.innerHTML = linesHtml;
+
+             elements.latestUpdate.textContent = formatTimestamp(maxTs === 0 ? null : maxTs); elements.oldestUpdate.textContent = formatTimestamp(minTs === Infinity ? null : minTs);
+             const avgAge = tsCount > 0 ? Math.round(ageSum / tsCount) : '?'; elements.avgDataAge.textContent = `~ ${avgAge} s`;
+             elements.avgDataAge.style.color = (avgAge !== '?' && avgAge > STALE_DATA_THRESHOLD_SECONDS) ? 'var(--warning-color)' : (avgAge !== '?' ? 'var(--text-primary)' : 'var(--text-secondary)');
+
+             const duration = Math.round(performance.now() - start); elements.processingTime.textContent = `${duration} ms`;
+             if (duration > 500) { elements.processingTime.style.color = 'var(--warning-color)'; updateStatusDot(elements.statusClientProcessingDot, 'warning'); elements.statusClientProcessing.textContent = "Wolne"; }
+             else { elements.processingTime.style.color = 'var(--text-primary)'; updateStatusDot(elements.statusClientProcessingDot, 'ok'); elements.statusClientProcessing.textContent = "OK"; }
+
+             elements.debugStaleInfo.style.display = 'none'; elements.debugStaleInfo.textContent = ""; // Clear debug info
+             elements.connectionStatus.textContent = "Aktywne"; elements.connectionStatus.style.color = 'var(--ok-color)'; elements.connectionDetails.textContent = `${total} pojazdów`;
+             updateStatusDot(elements.statusProxyDot, 'ok'); elements.statusProxy.textContent = "OK";
+             let ztmStatus='unknown', ztmText='Błąd', isStale=false;
+             if(maxTs > 0){ const age = calculateTimeDiff(maxTs); if(age > STALE_DATA_THRESHOLD_SECONDS){ isStale=true; const mins = Math.round(age/60); ztmStatus='error'; ztmText=`Problem ZTM (${mins} min)`; elements.debugStaleInfo.textContent = `DEBUG: Dane nieaktualne > ${STALE_DATA_THRESHOLD_SECONDS}s (wiek: ${age}s / ${mins}min)`; elements.debugStaleInfo.style.display = 'block'; } else { ztmStatus='ok'; ztmText='OK'; } }
+             else if(total > 0 && maxTs === 0) { ztmStatus='ok'; ztmText='OK'; }
+             else { ztmStatus='warning'; ztmText='Brak danych'; }
+             if(elements.statusZtmApi){ elements.statusZtmApi.textContent = ztmText; elements.statusZtmApi.classList.toggle('error-text', isStale); updateStatusDot(elements.statusZtmApiDot, ztmStatus); }
+
+             elements.lastUpdateTime.textContent = `Aktualizacja: ${new Date(now).toLocaleString('pl-PL')}`;
+             console.log("--- [updateDisplay] End ---");
+        }
+
+        function handleFetchError(error) { const now=Date.now(); console.error('[handleFetchError]', error); elements.connectionStatus.textContent="Błąd"; elements.connectionStatus.style.color='var(--danger-color)'; elements.connectionDetails.textContent=error.message||"Błąd proxy"; updateStatusDot(elements.statusProxyDot,'error'); elements.statusProxy.textContent="Błąd"; if(elements.statusZtmApi){elements.statusZtmApi.textContent="Nieznany"; elements.statusZtmApi.classList.remove('error-text'); updateStatusDot(elements.statusZtmApiDot,'unknown');} if(elements.statusClientProcessing){elements.statusClientProcessing.textContent="-"; updateStatusDot(elements.statusClientProcessingDot,'unknown');} elements.debugStaleInfo.style.display='none'; elements.lastUpdateTime.textContent=`Błąd: ${new Date(now).toLocaleString('pl-PL')}`; }
+
+        async function fetchVehicleData() { lastFetchTime=Date.now(); console.log(`[${new Date().toLocaleTimeString()}] Fetching...`); try { const r=await fetch('proxy.php',{cache:'no-store'}); if(!r.ok) throw new Error(`Proxy ${r.status}`); const buf=await r.arrayBuffer(); if(typeof protobuf==='undefined') throw Error("ProtobufJS?"); const root=await protobuf.load("gtfs-realtime.proto"); const Feed=root.lookupType("transit_realtime.FeedMessage"); updateDisplay(Feed.decode(new Uint8Array(buf))); } catch (err) { handleFetchError(err); } }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             console.log("[Init] DOM ready."); let theme='dark'; try{const saved=localStorage.getItem('theme'); if(saved==='light'||saved==='dark') theme=saved;}catch(e){} document.body.setAttribute('data-theme',theme);
+             try{const favs=JSON.parse(localStorage.getItem('favorites'))||{v:[],s:[]}; elements.favVehicles.textContent=favs.vehicles?.length||0; elements.favStops.textContent=favs.stops?.length||0;}catch(e){elements.favVehicles.textContent='Err'; elements.favStops.textContent='Err';}
+             elements.refreshInterval.textContent = `${REFRESH_INTERVAL_SECONDS} s`;
+             console.log("[Init] First fetch..."); fetchVehicleData();
+             console.log(`[Init] Set refresh interval: ${REFRESH_INTERVAL_SECONDS}s`); const fetchIntId=setInterval(fetchVehicleData, REFRESH_INTERVAL_SECONDS*1000);
+             console.log("[Init] Set connection monitor (10s)"); const monIntId=setInterval(()=>{const proxyErr=elements.statusProxyDot?.classList.contains('error'); const ztmStale=elements.statusZtmApiDot?.classList.contains('error'); const timeSince=lastSuccessfulFetchTime?Date.now()-lastSuccessfulFetchTime:Infinity; const warn=timeSince>(REFRESH_INTERVAL_SECONDS*3*1000); if(!proxyErr&&!ztmStale&&warn){console.warn(`[Monitor] No success since ${Math.round(timeSince/1000)}s`); elements.connectionStatus.textContent="Nieaktualne"; elements.connectionStatus.style.color='var(--warning-color)'; elements.connectionDetails.textContent=`Ostatni:${formatTimestamp(Math.floor(lastSuccessfulFetchTime/1000))}`; if(elements.statusZtmApi&&!elements.statusZtmApiDot?.classList.contains('error')){updateStatusDot(elements.statusZtmApiDot,'warning'); elements.statusZtmApi.textContent="Problem"; elements.statusZtmApi.classList.remove('error-text');}}}, 10000);
+        });
+    </script>
+</body>
+</html>

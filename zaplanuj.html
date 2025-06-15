@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Zaplanuj trasę | TwojaTrasa.online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="icon" type="image/png" href="favicons.png">
+    <style>
+        :root {
+            --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333;
+            --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b;
+            --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00;
+            --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px; --font-size-xlarge: 18px;
+            --border-radius: 8px;
+            --transition-duration: 0.15s;
+            --transition: all var(--transition-duration) ease-in-out;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body[data-theme="dark"], body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+            padding-top: 55px;
+        }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button, input, select {
+            font-family: inherit;
+            font-size: inherit;
+            transition: var(--transition);
+        }
+        input, select {
+            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color);
+            background: var(--bg-primary); color: var(--text-primary);
+        }
+        input:focus, select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+        button {
+            margin-top: 22px; width: 100%; background: var(--accent); color: var(--text-on-accent);
+            border: none; border-radius: 4px; padding: 12px; font-size: 1.1em; font-weight: 600; cursor: pointer;
+        }
+        button:hover, button:active { background: var(--accent-hover); }
+        .top-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 55px;
+            background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000;
+            transition: var(--transition); box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; }
+        .logo-option-2 .logo-icon { margin-right: 8px; font-size: 1.2em; color: var(--accent); line-height: 1; }
+        .logo-option-2 span { color: var(--accent); }
+        .top-bar .nav-links { display: flex; }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; margin-left: 10px; padding: 8px 12px; border-radius: var(--border-radius); }
+        .top-bar .back-link:hover { color: var(--accent-hover); background-color: var(--bg-tertiary); }
+        .container {
+            max-width: 480px; margin: 40px auto; background: var(--bg-secondary); border-radius: var(--border-radius);
+            box-shadow: 0 4px 24px var(--shadow-color); padding: 32px 24px 24px;
+        }
+        h2.section-title {
+            font-size: var(--font-size-xlarge); color: var(--accent); margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; align-items: center; gap: 10px;
+        }
+        label { display: block; margin-top: 18px; margin-bottom: 6px; font-weight: 500; }
+        .result { margin-top: 28px; background: var(--bg-tertiary); border-radius: 6px; padding: 18px; }
+        .back-link { display: block; margin-top: 30px; color: var(--accent); text-align: center; }
+        .autocomplete-results { position: absolute; background: #232323; color: #e0e0e0; border: 1px solid #444; border-radius: 0 0 6px 6px; width: 100%; max-height: 180px; overflow-y: auto; z-index: 10; margin-top: -4px; }
+        .autocomplete-results li { padding: 8px 12px; cursor: pointer; }
+        .autocomplete-results li.selected, .autocomplete-results li:hover { background: #333; }
+        .autocomplete-results .no-results { color: #888; cursor: default; }
+        .input-group { position: relative; }
+        .inline-btns { display: flex; gap: 8px; margin-top: 10px; }
+        .inline-btns button { width: auto; margin-top: 0; font-size: 0.98em; padding: 8px 14px; }
+        .msg { margin-top: 18px; color: #ffb300; font-size: 1em; }
+        .stop-info { margin-top: 10px; font-size: 0.98em; color: #b0e57c; }
+        .stop-lines { margin-top: 6px; color: #99cc00; font-size: 0.97em; }
+        @media (max-width: 600px) {
+            .container { margin: 15px; padding: 15px; }
+            h2.section-title { font-size: var(--font-size-large); padding-bottom: 8px; margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span>Trasa</span>
+        </div>
+       <div class="nav-links"> <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+            <a href="menu.html" class="back-link"><i class="fas fa-bars"></i> Menu</a> </div>
+    </div>
+    </div>
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-route"></i> Zaplanuj trasę</h2>
+        <form id="planForm" autocomplete="off">
+            <label for="from">Początek podróży:</label>
+            <div class="input-group">
+                <input type="text" id="from" name="from" placeholder="np. Rondo Kaponiera" required autocomplete="off">
+                <ul id="fromAutocomplete" class="autocomplete-results" style="display:none;"></ul>
+                <div id="fromInfo" class="stop-info"></div>
+            </div>
+            <label for="to">Cel podróży:</label>
+            <div class="input-group">
+                <input type="text" id="to" name="to" placeholder="np. Franowo" required autocomplete="off">
+                <ul id="toAutocomplete" class="autocomplete-results" style="display:none;"></ul>
+                <div id="toInfo" class="stop-info"></div>
+            </div>
+            <div class="inline-btns">
+                <button type="button" id="swapBtn" title="Zamień kierunek"><i class="fas fa-exchange-alt"></i> Zamień</button>
+                <button type="button" id="clearBtn" title="Wyczyść pola"><i class="fas fa-eraser"></i> Wyczyść</button>
+            </div>
+            <button type="submit"><i class="fas fa-route"></i> Znajdź połączenie</button>
+        </form>
+        <div class="msg" id="msg" style="display:none;"></div>
+        <div class="result" id="result" style="display:none;"></div>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Wróć do mapy</a>
+    </div>
+    <script>
+        // --- GTFS DATA ---
+        let stopsList = [];
+        let stopsMap = new Map(); // stop_name_lower => stopObj
+        let stopIdToLines = new Map(); // stop_id => Set(route_short_name)
+        let routeIdToShort = new Map(); // route_id => {short_name, type}
+
+        // Pobierz stops.txt, stop_times.txt, trips.txt, routes.txt
+        Promise.all([
+            fetch('stops.txt').then(r=>r.ok?r.text():""),
+            fetch('stop_times.txt').then(r=>r.ok?r.text():""),
+            fetch('trips.txt').then(r=>r.ok?r.text():""),
+            fetch('routes.txt').then(r=>r.ok?r.text():"")
+        ]).then(([stopsTxt, stopTimesTxt, tripsTxt, routesTxt]) => {
+            // stops.txt
+            const stopsLines = stopsTxt.split('\n');
+            const stopsHeader = stopsLines[0].split(',');
+            const stopIdIdx = stopsHeader.indexOf('stop_id');
+            const stopNameIdx = stopsHeader.indexOf('stop_name');
+            const stopCodeIdx = stopsHeader.indexOf('stop_code');
+            const stopDescIdx = stopsHeader.indexOf('stop_desc');
+            for(let i=1;i<stopsLines.length;i++) {
+                const cols = stopsLines[i].split(',');
+                if(cols.length > stopNameIdx) {
+                    const stop = {
+                        id: cols[stopIdIdx],
+                        name: cols[stopNameIdx].replace(/"/g,'').trim(),
+                        code: stopCodeIdx>-1 ? cols[stopCodeIdx].replace(/"/g,'').trim() : "",
+                        desc: stopDescIdx>-1 ? cols[stopDescIdx].replace(/"/g,'').trim() : ""
+                    };
+                    if(stop.name) {
+                        stopsList.push(stop);
+                        stopsMap.set(stop.name.toLowerCase(), stop);
+                    }
+                }
+            }
+            // routes.txt
+            const routesLines = routesTxt.split('\n');
+            const routesHeader = routesLines[0].split(',');
+            const routeIdIdx = routesHeader.indexOf('route_id');
+            const routeShortIdx = routesHeader.indexOf('route_short_name');
+            const routeTypeIdx = routesHeader.indexOf('route_type');
+            for(let i=1;i<routesLines.length;i++) {
+                const cols = routesLines[i].split(',');
+                if(cols.length > routeShortIdx) {
+                    routeIdToShort.set(cols[routeIdIdx], {
+                        short: cols[routeShortIdx],
+                        type: cols[routeTypeIdx]
+                    });
+                }
+            }
+            // trips.txt
+            const tripsLines = tripsTxt.split('\n');
+            const tripsHeader = tripsLines[0].split(',');
+            const tripIdIdx = tripsHeader.indexOf('trip_id');
+            const routeIdIdxTrips = tripsHeader.indexOf('route_id');
+            let tripIdToRouteId = new Map();
+            for(let i=1;i<tripsLines.length;i++) {
+                const cols = tripsLines[i].split(',');
+                if(cols.length > routeIdIdxTrips) {
+                    tripIdToRouteId.set(cols[tripIdIdx], cols[routeIdIdxTrips]);
+                }
+            }
+            // stop_times.txt
+            const stopTimesLines = stopTimesTxt.split('\n');
+            const stopTimesHeader = stopTimesLines[0].split(',');
+            const stopIdIdxST = stopTimesHeader.indexOf('stop_id');
+            const tripIdIdxST = stopTimesHeader.indexOf('trip_id');
+            for(let i=1;i<stopTimesLines.length;i++) {
+                const cols = stopTimesLines[i].split(',');
+                if(cols.length > stopIdIdxST && cols.length > tripIdIdxST) {
+                    const stop_id = cols[stopIdIdxST];
+                    const trip_id = cols[tripIdIdxST];
+                    const route_id = tripIdToRouteId.get(trip_id);
+                    const routeObj = routeIdToShort.get(route_id);
+                    if(routeObj && stop_id) {
+                        if(!stopIdToLines.has(stop_id)) stopIdToLines.set(stop_id, new Set());
+                        stopIdToLines.get(stop_id).add(routeObj.short);
+                    }
+                }
+            }
+        });
+
+        // --- AUTOCOMPLETE ---
+        function setupStopAutocomplete(inputId, listId, infoId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            const info = document.getElementById(infoId);
+            let selectedIdx = -1;
+            let currentMatches = [];
+
+            input.addEventListener('input', function() {
+                const val = input.value.trim().toLowerCase();
+                info.innerHTML = '';
+                if (!val || val.length < 2) {
+                    list.innerHTML = '';
+                    list.style.display = 'none';
+                    selectedIdx = -1;
+                    currentMatches = [];
+                    return;
+                }
+                currentMatches = stopsList.filter(stop => stop.name.toLowerCase().includes(val)).slice(0, 8);
+                if (currentMatches.length === 0) {
+                    list.innerHTML = '<li class="no-results">Brak wyników</li>';
+                    list.style.display = 'block';
+                    selectedIdx = -1;
+                    return;
+                }
+                list.innerHTML = currentMatches.map((stop, idx) =>
+                    `<li data-idx="${idx}"><b>${stop.name}</b>${stop.code ? ' <span style="color:#aaa">['+stop.code+']</span>' : ''}${stop.desc ? ' <span style="color:#b0e57c">'+stop.desc+'</span>' : ''}</li>`
+                ).join('');
+                list.style.display = 'block';
+                selectedIdx = -1;
+
+                Array.from(list.children).forEach(li => {
+                    li.onclick = function() {
+                        input.value = currentMatches[parseInt(this.dataset.idx)].name;
+                        list.innerHTML = '';
+                        list.style.display = 'none';
+                        showStopInfo(input.value, info);
+                    };
+                });
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (!list.style.display || list.style.display === 'none') return;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (selectedIdx < currentMatches.length - 1) selectedIdx++;
+                    updateSelection();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (selectedIdx > 0) selectedIdx--;
+                    updateSelection();
+                } else if (e.key === 'Enter') {
+                    if (selectedIdx >= 0 && currentMatches[selectedIdx]) {
+                        input.value = currentMatches[selectedIdx].name;
+                        list.innerHTML = '';
+                        list.style.display = 'none';
+                        showStopInfo(input.value, info);
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                setTimeout(() => { list.style.display = 'none'; }, 150);
+            });
+            input.addEventListener('focus', function() {
+                if (list.innerHTML) list.style.display = 'block';
+            });
+
+            input.addEventListener('change', function() {
+                showStopInfo(input.value, info);
+            });
+
+            function updateSelection() {
+                Array.from(list.children).forEach((li, idx) => {
+                    if(idx === selectedIdx) li.classList.add('selected');
+                    else li.classList.remove('selected');
+                });
+            }
+        }
+
+        function showStopInfo(stopName, infoElem) {
+            const stop = stopsMap.get(stopName.toLowerCase());
+            if (!stop) {
+                infoElem.innerHTML = '';
+                return;
+            }
+            let html = `<b>${stop.name}</b>`;
+            if (stop.code) html += ` <span style="color:#aaa">[${stop.code}]</span>`;
+            if (stop.desc) html += ` <span style="color:#b0e57c">${stop.desc}</span>`;
+            // Linie
+            const lines = stopIdToLines.get(stop.id);
+            if (lines && lines.size > 0) {
+                html += `<div class="stop-lines">Odjeżdżające linie: ${Array.from(lines).sort().join(', ')}</div>`;
+            }
+            infoElem.innerHTML = html;
+        }
+
+        // Poczekaj aż DOM będzie gotowy
+        document.addEventListener('DOMContentLoaded', function() {
+            setupStopAutocomplete('from', 'fromAutocomplete', 'fromInfo');
+            setupStopAutocomplete('to', 'toAutocomplete', 'toInfo');
+        });
+
+        // Zamiana kierunku
+        document.getElementById('swapBtn').onclick = function() {
+            const from = document.getElementById('from');
+            const to = document.getElementById('to');
+            [from.value, to.value] = [to.value, from.value];
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('msg').style.display = 'none';
+            showStopInfo(from.value, document.getElementById('fromInfo'));
+            showStopInfo(to.value, document.getElementById('toInfo'));
+        };
+        // Wyczyść pola
+        document.getElementById('clearBtn').onclick = function() {
+            document.getElementById('from').value = '';
+            document.getElementById('to').value = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('msg').style.display = 'none';
+            document.getElementById('fromInfo').innerHTML = '';
+            document.getElementById('toInfo').innerHTML = '';
+        };
+
+        // Walidacja i obsługa formularza
+        document.getElementById('planForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const from = document.getElementById('from').value.trim();
+            const to = document.getElementById('to').value.trim();
+            const result = document.getElementById('result');
+            const msg = document.getElementById('msg');
+            msg.style.display = 'none';
+            result.style.display = 'none';
+
+            if(!from || !to) {
+                msg.textContent = "Podaj oba przystanki!";
+                msg.style.display = 'block';
+                return;
+            }
+            if(from.toLowerCase() === to.toLowerCase()) {
+                msg.textContent = "Początek i cel podróży muszą być różne.";
+                msg.style.display = 'block';
+                return;
+            }
+            // Sprawdź czy przystanki istnieją na liście
+            if(!stopsMap.has(from.toLowerCase())) {
+                msg.textContent = "Nie znaleziono przystanku początkowego.";
+                msg.style.display = 'block';
+                return;
+            }
+            if(!stopsMap.has(to.toLowerCase())) {
+                msg.textContent = "Nie znaleziono przystanku docelowego.";
+                msg.style.display = 'block';
+                return;
+            }
+
+            result.style.display = 'block';
+            result.innerHTML = `<b>Trasa z <span style="color:var(--accent,#99cc00)">${from}</span> do <span style="color:var(--accent,#99cc00)">${to}</span></b><br><br>
+                <button id="showOnMapBtn" style="margin-top:10px;" class="popup-button"><i class="fas fa-map"></i> Pokaż na mapie</button>
+                <a href="index.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}" style="margin-left:10px;color:var(--accent,#99cc00);margin-top:10px;display:inline-block;"><i class="fas fa-map-marked-alt"></i> Pokaż na mapie głównej</a>
+                <br><br>
+                <span style="color:#aaa;font-size:0.98em;">Wkrótce: automatyczne wyznaczanie tras, podpowiedzi linii, integracja z mapą!</span>
+            `;
+            setTimeout(() => {
+                const btn = document.getElementById('showOnMapBtn');
+                if(btn) {
+                    btn.onclick = function() {
+                        window.location.href = `index.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+                    }
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

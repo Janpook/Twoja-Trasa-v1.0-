@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Ładowania Danych Tras</title>
+    <script src="trips_data.js?v=1" defer></script>
+    <script src="shapes.js?v=1" defer></script>
+</head>
+<body>
+    <h1>Test Ładowania Skryptów</h1>
+    <p>Sprawdź konsolę deweloperską (F12) po załadowaniu strony.</p>
+
+    <script>
+        // Poczekaj na załadowanie wszystkich zasobów strony
+        window.addEventListener('load', () => {
+            console.log('--- ROZPOCZĘCIE TESTU ŁADOWANIA ---');
+            let tripMapSize = 'NIE ZDEFINIOWANO';
+            let shapesDataKeys = 'NIE ZDEFINIOWANO';
+            let foundTrip1 = 'NIE SPRAWDZONO';
+            let foundTrip2 = 'NIE SPRAWDZONO';
+            let foundShape = 'NIE SPRAWDZONO';
+
+            try {
+                if (typeof tripToShapeMap !== 'undefined') {
+                    tripMapSize = tripToShapeMap.size;
+                    // Sprawdź klucze, które wcześniej zawodziły (używamy czystych ID)
+                    foundTrip1 = tripToShapeMap.has('5_495260') ? 'TAK' : 'NIE'; // Z logów błędu
+                    foundTrip2 = tripToShapeMap.has('7_496870') ? 'TAK' : 'NIE'; // Z przykładu trips.txt
+                }
+            } catch (e) {
+                console.error('Błąd podczas sprawdzania tripToShapeMap:', e);
+                tripMapSize = 'BŁĄD';
+            }
+
+             try {
+                if (typeof shapesData !== 'undefined') {
+                    // Sprawdźmy, czy shapesData jest obiektem czy Mapą
+                    if (shapesData instanceof Map) {
+                        shapesDataKeys = shapesData.size;
+                        foundShape = shapesData.has('68468') ? 'TAK' : 'NIE'; // Shape ID z przykładu trips.txt
+                    } else if (typeof shapesData === 'object' && shapesData !== null) {
+                         shapesDataKeys = Object.keys(shapesData).length;
+                         foundShape = shapesData.hasOwnProperty('68468') ? 'TAK' : 'NIE';
+                    } else {
+                        shapesDataKeys = 'NIEPRAWIDŁOWY TYP';
+                    }
+                }
+            } catch (e) {
+                console.error('Błąd podczas sprawdzania shapesData:', e);
+                shapesDataKeys = 'BŁĄD';
+            }
+
+            console.log(`Rozmiar tripToShapeMap: ${tripMapSize}`);
+            console.log(`Znaleziono klucz '5_495260' w tripToShapeMap: ${foundTrip1}`);
+            console.log(`Znaleziono klucz '7_496870' w tripToShapeMap: ${foundTrip2}`);
+            console.log(`Liczba kluczy (kształtów) w shapesData: ${shapesDataKeys}`);
+            console.log(`Znaleziono klucz '68468' w shapesData: ${foundShape}`);
+            console.log('--- KONIEC TESTU ŁADOWANIA ---');
+        });
+    </script>
+</body>
+</html>

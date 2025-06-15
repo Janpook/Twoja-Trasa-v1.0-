@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Estymowana pozycja linii 100</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { width: 100vw; height: 100vh; }
+    </style>
+    <script>
+    // Rozkład i przystanki linii 100
+    window.staticSchedule100 = [
+        { stop: "Poznań Główny", lat: 52.4011, lon: 16.9207, times: ["10:00","10:40","11:20","12:00","12:40","13:20","14:20","15:00","15:40","16:20","17:00","17:40"] },
+        { stop: "Rondo Kaponiera NŻ.", lat: 52.4081, lon: 16.9217, times: ["10:01","10:41","11:21","12:01","12:41","13:21","14:21","15:01","15:41","16:21","17:01","17:41"] },
+        { stop: "Rondo Kaponiera NŻ.", lat: 52.4081, lon: 16.9217, times: ["10:03","10:43","11:23","12:03","12:43","13:23","14:23","15:03","15:43","16:23","17:03","17:43"] },
+        { stop: "Stare Zoo NŻ.", lat: 52.4096, lon: 16.9157, times: ["10:04","10:44","11:24","12:04","12:44","13:24","14:24","15:04","15:44","16:24","17:04","17:44"] },
+        { stop: "Rynek Jeżycki NŻ.", lat: 52.4117, lon: 16.9112, times: ["10:06","10:46","11:26","12:06","12:46","13:26","14:26","15:06","15:46","16:26","17:06","17:46"] },
+        { stop: "Jeżycka NŻ.", lat: 52.4132, lon: 16.9082, times: ["10:08","10:48","11:28","12:08","12:48","13:28","14:28","15:08","15:48","16:28","17:08","17:48"] },
+        { stop: "Klin NŻ.", lat: 52.4152, lon: 16.9052, times: ["10:11","10:51","11:31","12:11","12:51","13:31","14:31","15:11","15:51","16:31","17:11","17:51"] },
+        { stop: "Nowowiejskiego NŻ.", lat: 52.4172, lon: 16.9022, times: ["10:13","10:53","11:33","12:13","12:53","13:33","14:33","15:13","15:53","16:33","17:13","17:53"] },
+        { stop: "Libelta NŻ.", lat: 52.4192, lon: 16.8992, times: ["10:14","10:54","11:34","12:14","12:54","13:34","14:34","15:14","15:54","16:34","17:14","17:54"] },
+        { stop: "Zamek NŻ.", lat: 52.4212, lon: 16.8962, times: ["10:16","10:56","11:36","12:16","12:56","13:36","14:36","15:16","15:56","16:36","17:16","17:56"] },
+        { stop: "Święty Marcin NŻ.", lat: 52.4232, lon: 16.8932, times: ["10:19","10:59","11:39","12:19","12:59","13:39","14:39","15:19","15:59","16:39","17:19","17:59"] },
+        { stop: "Pl. Wielkopolski NŻ.", lat: 52.4252, lon: 16.8902, times: ["10:23","11:03","11:43","12:23","13:03","13:43","14:43","15:23","16:03","16:43","17:23","18:03"] },
+        { stop: "Małe Garbary NŻ.", lat: 52.4272, lon: 16.8872, times: ["10:25","11:05","11:45","12:25","13:05","13:45","14:45","15:25","16:05","16:45","17:25","18:05"] },
+        { stop: "Katedra NŻ.", lat: 52.4292, lon: 16.8842, times: ["10:26","11:06","11:46","12:26","13:06","13:46","14:46","15:26","16:06","16:46","17:26","18:06"] },
+        { stop: "Rondo Śródka NŻ.", lat: 52.4312, lon: 16.8812, times: ["10:28","11:08","11:48","12:28","13:08","13:48","14:48","15:28","16:08","16:48","17:28","18:08"] },
+        { stop: "Termalna NŻ.", lat: 52.4332, lon: 16.8782, times: ["10:31","11:11","11:51","12:31","13:11","13:51","14:51","15:31","16:11","16:51","17:31","18:11"] },
+        { stop: "Termy Maltańskie NŻ.", lat: 52.4352, lon: 16.8752, times: ["10:32","11:12","11:52","12:32","13:12","13:52","14:52","15:32","16:12","16:52","17:32","18:12"] },
+        { stop: "Tor Regatowy Malta NŻ.", lat: 52.4372, lon: 16.8722, times: ["10:34","11:14","11:54","12:34","13:14","13:54","14:54","15:34","16:14","16:54","17:34","18:14"] },
+        { stop: "Nowe ZOO", lat: 52.4392, lon: 16.8692, times: ["10:35","11:15","11:55","12:35","13:15","13:55","14:55","15:35","16:15","16:55","17:35","18:15"] }
+    ];
+
+    function timeToMinutes(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function getEstimatedPosition100() {
+        const schedule = window.staticSchedule100;
+        if (!schedule) return null;
+
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+
+        for (let i = 0; i < schedule[0].times.length; i++) {
+            for (let j = 0; j < schedule.length - 1; j++) {
+                const tA = timeToMinutes(schedule[j].times[i]);
+                const tB = timeToMinutes(schedule[j + 1].times[i]);
+                if (nowMins >= tA && nowMins <= tB) {
+                    const stopA = schedule[j];
+                    const stopB = schedule[j + 1];
+                    const frac = (nowMins - tA) / (tB - tA);
+                    const lat = stopA.lat + (stopB.lat - stopA.lat) * frac;
+                    const lon = stopA.lon + (stopB.lon - stopA.lon) * frac;
+                    return {
+                        lat, lon,
+                        stopA: stopA.stop,
+                        stopB: stopB.stop,
+                        kurs: i + 1
+                    };
+                }
+            }
+        }
+        return null;
+    }
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    // Inicjalizacja mapy
+    const map = L.map('map').setView([52.41, 16.92], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OSM contributors'
+    }).addTo(map);
+
+    let estimatedMarker100 = null;
+
+    function updateEstimatedMarker100() {
+        const pos = getEstimatedPosition100();
+        console.log("[ESTYMATA] Wynik getEstimatedPosition100:", pos);
+
+        if (!pos) {
+            if (estimatedMarker100 && map.hasLayer(estimatedMarker100)) map.removeLayer(estimatedMarker100);
+            estimatedMarker100 = null;
+            return;
+        }
+
+        if (estimatedMarker100) {
+            estimatedMarker100.setLatLng([pos.lat, pos.lon]);
+            estimatedMarker100.setPopupContent(`<b>Estymowana pozycja</b><br>Linia: 100<br>Między: ${pos.stopA} → ${pos.stopB}<br><i>(Brak GPS, pozycja szacowana z rozkładu)</i>`);
+        } else {
+            estimatedMarker100 = L.marker([pos.lat, pos.lon], {
+                icon: L.divIcon({
+                    html: `<div style="background:#888;color:#fff;border-radius:50%;padding:6px 8px;opacity:0.7;border:2px dashed #fff;">100</div>`,
+                    className: '',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                })
+            }).bindPopup(`<b>Estymowana pozycja</b><br>Linia: 100<br>Między: ${pos.stopA} → ${pos.stopB}<br><i>(Brak GPS, pozycja szacowana z rozkładu)</i>`);
+            estimatedMarker100.addTo(map);
+        }
+    }
+
+    // Od razu po starcie i co 30 sekund
+    updateEstimatedMarker100();
+    setInterval(updateEstimatedMarker100, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-N9G560TT5P');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwojaTrasa.online - Poznańska komunikacja na żywo</title>
+    <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style">
+    <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" as="script">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.4.0/dist/protobuf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" defer></script>
+    <script src="trips_data.js?v=1" defer></script>
+    <script src="shapes.js?v=1" defer></script>
+	<script src="vehicleTrail.js" defer></script>
+    <style>
+        /* --- CSS (Minimalistyczny / Dark / MPK s) --- */
+        :root { --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333; --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b; --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00; --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2); --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px; --border-radius: 4px; --transition: all 0.2s ease-in-out; --danger-color: #f44336; --warning-color: #ff9800; --ok-color: var(--accent); --info-color: #00bcd4; }
+        body[data-theme="light"] { --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee; --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd; --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00; --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1); --danger-color: #e53935; --warning-color: #fb8c00; --ok-color: var(--accent); --info-color: #00acc1; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.5; overflow: hidden; transition: var(--transition); }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); } a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; } ul, ol { list-style: none; }
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); }
+        #map { position: fixed; top: 55px; bottom: 50px; left: 0; width: 100%; z-index: 1; background-color: var(--bg-tertiary); }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 50px; background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 1000; transition: var(--transition); }
+        body[data-theme="dark"] .leaflet-tile-pane { filter: grayscale(0.1) brightness(0.8) contrast(1.2); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); margin-right: 20px; } .top-bar .logo span { color: var(--accent); }
+        #mapSearch { flex-grow: 1; max-width: 500px; } .search-container { position: relative; }
+        #mapSearchInput { width: 100%; padding: 8px 15px 8px 35px; font-size: var(--font-size-base); background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius); color: var(--text-primary); transition: var(--transition); }
+        #mapSearchInput::placeholder { color: var(--text-secondary); opacity: 1; } #mapSearchInput:focus { outline: none; border-color: var(--accent); background-color: var(--bg-secondary); }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: var(--font-size-base); color: var(--text-secondary); pointer-events: none; }
+        .bottom-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); font-size: var(--font-size-small); text-align: center; padding: 4px 0; height: 100%; position: relative; border-radius: 0; transition: var(--transition); }
+        .bottom-bar a i { font-size: 18px; margin-bottom: 2px; } .bottom-bar a:hover { color: var(--text-primary); background-color: var(--bg-tertiary); text-decoration: none; }
+        .bottom-bar a.active { color: var(--accent); font-weight: 500; } .bottom-bar a.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40%; height: 3px; background-color: var(--accent); border-radius: 2px; }
+        .bottom-bar .favorite-count, .bottom-bar .alert-count { display: none; }
+        .bottom-bar .submenu { display: none; opacity: 0; position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%) translateY(5px); width: 220px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: 0 4px 12px var(--shadow-color); padding: 5px 0; z-index: 1001; transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+        .bottom-bar a:last-child + .submenu { left: auto; right: 5px; transform: translateX(0) translateY(5px); transform-origin: bottom right; }
+        .bottom-bar .submenu.active { display: block; opacity: 1; transform: translateX(-50%) translateY(0); } .bottom-bar a:last-child + .submenu.active { transform: translateX(0) translateY(0); }
+        .bottom-bar .submenu a { display: flex; flex-direction: row; align-items: center; padding: 10px 15px; color: var(--text-primary); font-size: var(--font-size-base); text-align: left; height: auto; position: static; background-color: transparent; }
+        .bottom-bar .submenu a::after { content: none; } .bottom-bar .submenu a:hover { background-color: var(--bg-tertiary); color: var(--accent); }
+        .bottom-bar .submenu a i { font-size: 14px; margin-right: 10px; width: 16px; text-align: center; color: var(--text-secondary); } .bottom-bar .submenu a:hover i { color: var(--accent); }
+        .submenu-separator { height: 1px; background-color: var(--border-color); margin: 5px 0; }
+        .zoom-controls { position: absolute; bottom: 15px; right: 15px; z-index: 999; display: flex; flex-direction: column; gap: 1px; }
+        .zoom-controls button { width: 36px; height: 36px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 18px; display: flex; align-items: center; justify-content: center; transition: var(--transition); box-shadow: 0 1px 3px var(--shadow-color); }
+        .zoom-controls button:first-child { border-radius: var(--border-radius) var(--border-radius) 0 0; } .zoom-controls button:last-child { border-radius: 0 0 var(--border-radius) var(--border-radius); border-top: none; }
+        .zoom-controls button:nth-child(2) { border-top: none; border-radius: 0; } .zoom-controls button:hover { background-color: var(--bg-tertiary); color: var(--accent); } .zoom-controls button#locateBtn i { font-size: 16px; }
+        .leaflet-popup-content-wrapper {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            padding: 0;
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 15px;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            min-width: 280px;
+            max-width: 320px;
+        }
+
+        .popup-header {
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .popup-header .main-info .title {
+            font-size: var(--font-size-large);
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .popup-header .main-info .subtitle {
+            font-size: var(--font-size-small);
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .popup-header .actions .favorite-icon {
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .popup-header .actions .favorite-icon:hover {
+            color: var(--accent-yellow);
+        }
+
+        .popup-header .actions .favorite-icon.favorite {
+            color: var(--accent-yellow);
+        }
+
+        .popup-details dl {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 5px 10px;
+            font-size: var(--font-size-base);
+        }
+
+        .popup-details dt {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .popup-details dd {
+            color: var(--text-primary);
+        }
+
+        .popup-button-group {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .popup-button {
+            background-color: var(--accent);
+            color: var(--text-on-accent);
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .popup-button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .popup-button i {
+            font-size: 1.1em;
+        }
+
+        .popup-button-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .popup-button-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        .leaflet-popup-tip-container { display: none; } .leaflet-popup-close-button { color: var(--text-secondary); font-size: 20px; padding: 5px; top: 5px; right: 5px; } .leaflet-popup-close-button:hover { color: var(--text-primary); background: none; }
+        .popup-section { margin-top: 15px; } .popup-section-title { font-size: var(--font-size-small); font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+        .popup-details dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: var(--font-size-base); } .popup-details dt { font-weight: 500; color: var(--text-secondary); } .popup-details dd { color: var(--text-primary); }
+        .popup-button-group { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; } .popup-button { background-color: var(--accent); color: var(--text-on-accent); padding: 8px 15px; border-radius: var(--border-radius); font-size: var(--font-size-small); font-weight: 500; transition: var(--transition); display: inline-flex; align-items: center; gap: 5px; } .popup-button:hover { background-color: var(--accent-hover); } .popup-button i { font-size: 1.1em; } .popup-button-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); } .popup-button-secondary:hover { background-color: var(--border-color); }
+        .departure-list, .trip-stop-list { max-height: 180px; overflow-y: auto; margin-top: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 5px; background-color: var(--bg-primary); } .departure-list li, .trip-stop-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-size: var(--font-size-small); } .departure-list li:last-child, .trip-stop-list li:last-child { border-bottom: none; }
+        .dep-line-dest, .stop-details { flex-grow: 1; margin-right: 10px; } .dep-line-badge-dest, .stop-name { font-weight: 500; color: var(--text-primary); } .dep-dest, .stop-sequence { font-size: 0.9em; color: var(--text-secondary); } .vehicle-current-stop { font-size: 0.9em; color: var(--text-tertiary); margin-top: 2px; } .dep-time-details, .time-info { text-align: right; flex-shrink: 0; min-width: 60px; } .dep-time, .scheduled-time, .estimated-time { font-weight: 500; display: block; } .rt-time, .estimated-time { color: var(--accent); } .dep-details, .status-details { font-size: 0.9em; color: var(--text-secondary); margin-top: 2px; }
+        .line-badge { display: inline-block; padding: 2px 6px; border-radius: var(--border-radius); font-weight: 500; font-size: 0.9em; margin-right: 5px; color: var(--text-primary); text-align: center; min-width: 20px; border: 1px solid var(--border-color); } .line-badge.tram { border-color: var(--accent-yellow); color: var(--accent-yellow); background: none; } .line-badge.bus { border-color: var(--accent); color: var(--accent); background: none; } .line-badge.unknown { border-color: var(--text-tertiary); color: var(--text-tertiary); background: none; }
+        .trip-stop-list li.passed { opacity: 0.5; } .trip-stop-list li.current { background-color: var(--bg-tertiary); border-left: 3px solid var(--accent); padding-left: 7px; } .trip-stop-list li.current .stop-name { color: var(--accent); }
+        .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 26, 26, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; opacity: 1; transition: opacity 0.3s ease; } body[data-theme="light"] .loader { background: rgba(255, 255, 255, 0.9); } .loader .spinner { width: 40px; height: 40px; border: 4px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; } .loader .loader-text { margin-top: 15px; color: var(--text-primary); font-size: var(--font-size-base); font-weight: 500; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .cookie-consent { background: var(--bg-secondary); color: var(--text-primary); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); box-shadow: 0 2px 10px var(--shadow-color); display: none; align-items: center; justify-content: space-between; z-index: 2000; font-size: var(--font-size-small); gap: 15px; position: fixed; bottom: 10px; left: 10px; right: 10px; } .cookie-consent p { margin: 0; flex-grow: 1; } .cookie-consent .buttons { display: flex; gap: 10px; flex-shrink: 0; } .cookie-consent button, .cookie-consent a { padding: 6px 12px; font-size: var(--font-size-small); font-weight: 500; border-radius: var(--border-radius); transition: var(--transition); } .cookie-consent button { background-color: var(--accent); color: var(--text-on-accent); } .cookie-consent button:hover { background-color: var(--accent-hover); } .cookie-consent a { color: var(--text-primary); background-color: var(--bg-tertiary); } .cookie-consent a:hover { background-color: var(--border-color); text-decoration: none; }
+        .notification-container {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 90%;
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            color: #fff;
+            width: auto;
+            max-width: 400px;
+            opacity: 1;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            background-color: #333;
+        }
+
+        .notification.success {
+            background-color: #5cb85c;
+        }
+
+        .notification.error {
+            background-color: #d9534f;
+        }
+
+        .notification.warning {
+            background-color: #f0ad4e;
+        }
+
+        .notification.info {
+            background-color: #0f1011; /* Dopasowany kolor */
+            color: #ffffff; /* Kolor tekstu */
+        }
+
+        .notification .close-btn {
+            margin-left: 15px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            padding: 0;
+        }
+
+        .notification .close-btn:hover {
+            opacity: 1;
+        }
+        .modal-overlay { background: rgba(0, 0, 0, 0.7); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 1200; } .modal-overlay.active { display: flex; } /* Dodano pozycjonowanie i flex */
+        .modal-container { background: var(--bg-secondary); color: var(--text-primary); border-radius: var(--border-radius); box-shadow: 0 5px 20px var(--shadow-color); max-width: 550px; border: 1px solid var(--border-color); width: 90%; /* Dodano szerokość dla responsywności */ }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; /* Dodano dla przycisku zamknięcia */ }
+        .modal-header h3 { font-size: var(--font-size-large); font-weight: 600; margin: 0; /* Usunięto domyślny margines */}
+        .modal-close-btn { color: var(--text-secondary); font-size: 24px; background: none; border: none; cursor: pointer; padding: 0 5px; /* Dodano padding */ line-height: 1; /* Dodano dla lepszego wyrównania */ }
+        .modal-close-btn:hover { color: var(--text-primary); }
+        .modal-content { padding: 20px; font-size: var(--font-size-base); max-height: 70vh; /* Ograniczenie wysokości */ overflow-y: auto; /* Scroll w razie potrzeby */ }
+        .marker-cluster div { background-color: var(--accent); color: var(--text-on-accent); font-weight: bold; border-radius: 50%; box-shadow: 0 0 0 3px var(--bg-secondary); display: flex; align-items: center; justify-content: center; } /* Dodano flex dla wyśrodkowania */
+        .marker-cluster-small { background-color: var(--accent); }
+        .marker-cluster-medium { background-color: var(--accent); opacity: 0.8; }
+        .marker-cluster-large { background-color: var(--accent); opacity: 0.6; }
+        .departure-list .gps-link { color: var(--accent); font-size: 0.9em; text-decoration: none; margin-left: 5px; } .departure-list .gps-link:hover { color: var(--accent-hover); } li.no-departures, li.no-results { text-align: center; color: var(--text-secondary); padding: 10px; font-style: italic; border: none; background: none; }
+        @media (max-width: 768px) {
+            :root {
+                --font-size-base: 13px;
+                --font-size-small: 11px;
+                --font-size-large: 15px;
+            }
+
+            .top-bar {
+                height: 50px;
+                padding: 0 10px;
+            }
+
+            .top-bar .logo {
+                font-size: 18px;
+            }
+
+            #map {
+                top: 50px;
+                bottom: 45px;
+            }
+
+            .bottom-bar {
+                height: 45px;
+            }
+
+            .bottom-bar a i {
+                font-size: 16px;
+            }
+
+            .zoom-controls {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .zoom-controls button {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .leaflet-popup-content {
+                min-width: calc(90vw - 30px);
+                max-width: calc(90vw - 30px);
+                padding: 12px;
+            }
+
+            .popup-header .main-info .title {
+                font-size: 15px;
+            }
+
+            .popup-details dl {
+                font-size: 13px;
+            }
+
+            .cookie-consent {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .cookie-consent .buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .notification-container {
+                top: 60px;
+            }
+
+            .notification {
+                max-width: 95%;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .modal-container {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .modal-header {
+                padding: 12px 15px;
+            }
+
+            .modal-content {
+                padding: 15px;
+            }
+
+            .bottom-bar .submenu {
+                display: none;
+            }
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .autocomplete-results li {
+            padding: 10px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .autocomplete-results li:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--accent);
+        }
+
+        /* --- Opcja 2: Logo z ikoną pinezki --- */
+        .logo-option-2 {
+            display: flex; /* Ustawia ikonę i tekst w jednej linii */
+            align-items: center; /* Wyśrodkowuje ikonę i tekst pionowo */
+        }
+        .logo-option-2 .logo-icon {
+            margin-right: 8px; /* Odstęp między ikoną a tekstem */
+            font-size: 1.2em; /* Lekko powiększona ikona */
+            color: var(--accent); /* Kolor ikony dopasowany do akcentu */
+            line-height: 1; /* Zapobiega problemom z wysokością linii */
+        }
+        /* Zachowujemy oryginalne podświetlenie 'Trasa' */
+        .logo-option-2 span {
+           color: var(--accent);
+        }
+        /* --- Koniec Opcji 2 --- */
+
+        /* --- NOWE STYLE DLA MARKERA KROPKI --- */
+        .vehicle-dot-icon-container {
+            /* Usuwamy tło i ramkę domyślną leaflet-div-icon, jeśli przeszkadzają */
+            background: none !important;
+            border: none !important;
+        }
+        .vehicle-dot-marker {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%; /* Okrągły kształt */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px; /* Można dostosować */
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4); /* Subtelny cień */
+            text-align: center;
+            line-height: 1;
+            border: 1px solid rgba(0,0,0,0.2); /* Delikatne obramowanie dla lepszego kontrastu */
+            box-sizing: border-box; /* Aby border nie powiększał elementu */
+        }
+        .vehicle-dot-marker span {
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            /* Kolor tekstu będzie ustawiony dynamicznie w JS, ale można dodać domyślny */
+            color: var(--text-on-accent);
+        }
+        /* --- KONIEC STYLÓW DLA MARKERA KROPKI --- */
+
+        /* --- NOWE STYLE DLA PRZYCISKÓW FILTRÓW --- */
+        .filter-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .filter-buttons ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .filter-buttons li {
+            margin-bottom: 5px;
+        }
+
+        .filter-buttons a {
+            display: block;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .filter-buttons a:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--accent);
+        }
+
+        .filter-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: var(--bg-secondary); /* Dodano tło */
+            padding: 10px; /* Dodano odstępy */
+            border-radius: var(--border-radius); /* Zaokrąglone rogi */
+            box-shadow: 0 2px 5px var(--shadow-color); /* Subtelny cień */
+            border: 1px solid var(--border-color); /* Obramowanie */
+        }
+
+        .filter-buttons label {
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+        }
+
+        .filter-buttons select {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 5px;
+            font-size: var(--font-size-base);
+            transition: var(--transition);
+        }
+
+        .filter-buttons select:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--accent);
+        }
+        /* --- KONIEC STYLÓW DLA PRZYCISKÓW FILTRÓW --- */
+
+        /* --- NOWE STYLE DLA LISTY W SEKCJI POPUP --- */
+        .popup-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .popup-section ul li {
+            margin-bottom: 5px;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+        }
+        /* --- KONIEC STYLÓW DLA LISTY W SEKCJI POPUP --- */
+
+        /* Dodatkowe style dla ikony pojazdu (kontenera), jeśli potrzebne */
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">Ładowanie danych...</div>
+    </div>
+
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span> Trasa</span>
+        </div>
+        <div id="mapSearch">
+            <div class="search-container">
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+                <input type="text" id="mapSearchInput" placeholder="Szukaj linii, przystanków...">
+                <ul id="autocompleteResults" class="autocomplete-results"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="map">
+        <div class="zoom-controls">
+            <button onclick="map.zoomIn()" aria-label="Przybliż"><i class="fas fa-plus"></i></button>
+            <button onclick="map.zoomOut()" aria-label="Oddal"><i class="fas fa-minus"></i></button>
+            <button id="locateBtn" onclick="locateUser()" aria-label="Moja lokalizacja"><i class="fas fa-crosshairs"></i></button>
+        </div>
+
+        <!-- Kontener dla przycisków filtrowania -->
+        <div class="filter-buttons">
+            <label for="filterSelect">Filtruj pojazdy:</label>
+            <select id="filterSelect" onchange="filterVehicles(this.value)">
+                <option value="all">Wszystkie</option>
+                <option value="tram">Tramwaje</option>
+                <option value="bus">Autobusy</option>
+                <option value="favorites">Ulubione pojazdy</option>
+                <option value="favoriteRoutes">Ulubione trasy</option>
+                <option value="estymata">Estymaty (linie bez GPS)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="favorites.html" onclick="saveMapState()"><i class="fas fa-star"></i>Ulubione</a>
+        <a href="https://twojatrasa.online/tablica/TABOROWE"  aria-label="Tablica odjazdów"><i class="fas fa-table"></i>Tablica odjazdów</a>
+		<a href="menu.html" onclick="saveMapState()"><i class="fas fa-bars"></i>Menu</a>
+        <a href="#" onclick="showPlanPanel();return false;"><i class="fas fa-route"></i>Zaplanuj trasę</a>
+        <div id="settings-submenu" class="submenu">
+            <a href="about.html"><i class="fas fa-info-circle"></i> O projekcie</a>
+            <a href="stats.html"><i class="fas fa-chart-bar"></i> Statystyki</a>
+            <a href="cookies.html"><i class="fas fa-cookie-bite"></i> Ciasteczka</a>
+            <a href="#" onclick="showSection('alerts'); return false;" aria-label="Komunikaty"><i class="fas fa-bell"></i>Komunikaty</a>
+            <a href="https://www.ztm.poznan.pl/pl/rozklad-jazdy/" target="_blank" rel="noopener noreferrer"><i class="fas fa-clock"></i> Rozkłady ZTM</a>
+            <div class="submenu-separator"></div>
+            <a href="settings.html"><i class="fas fa-cog"></i> Ustawienia</a>
+            <div class="submenu-separator"></div>
+            <a href="#" onclick="toggleTheme(); return false;"><i id="theme-icon" class="fas fa-sun"></i> <span id="theme-text">Tryb Jasny</span></a>
+        </div>
+    </div>
+
+    <div class="cookie-consent" id="cookieConsent">
+        <p>Używamy ciasteczek dla lepszego działania strony.</p>
+        <div class="buttons">
+            <a href="cookies.html">Ustawienia</a>
+			<a href="polityka-prywatnosci.html">Polityka Prywatności</a>
+            <button onclick="acceptAllCookies()">Akceptuj</button>
+        </div>
+    </div>
+    <div class="notification-container" id="notificationContainer"></div>
+    <div id="notifications" class="notification-container"></div>
+
+    <div class="modal-overlay" id="brigadeScheduleModalOverlay">
+        <div class="modal-container" id="brigadeScheduleModalContainer">
+            <div class="modal-header">
+                <h3 id="brigadeScheduleModalTitle">Rozkład Brygady</h3>
+                <button class="modal-close-btn" onclick="closeBrigadeModal()" aria-label="Zamknij">&times;</button>
+            </div>
+            <div class="modal-content" id="brigadeScheduleModalContent">
+                <p>Ładowanie...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel menu -->
+<div id="menuPanel" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-secondary); z-index:3000; overflow:auto;">
+    <div style="max-width:420px;margin:40px auto 0;background:var(--bg-primary);border-radius:8px;box-shadow:0 4px 24px var(--shadow-color);padding:32px 24px 24px;position:relative;">
+        <button onclick="hideMenuPanel()" style="position:absolute;top:16px;right:16px;font-size:22px;background:none;border:none;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h2 style="margin-bottom:18px;font-size:1.4em;color:var(--accent);font-weight:700;">Menu</h2>
+        <ul style="list-style:none;padding:0;margin:0;">
+            <li style="margin-bottom:12px;"><a href="about.html" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-info-circle"></i> O projekcie</a></li>
+            <li style="margin-bottom:12px;"><a href="stats.html" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-chart-bar"></i> Statystyki</a></li>
+            <li style="margin-bottom:12px;"><a href="cookies.html" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-cookie-bite"></i> Ciasteczka</a></li>
+            <li style="margin-bottom:12px;"><a href="settings.html" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-cog"></i> Ustawienia</a></li>
+            <li style="margin-bottom:12px;"><a href="https://www.ztm.poznan.pl/pl/rozklad-jazdy/" target="_blank" rel="noopener" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-clock"></i> Rozkłady ZTM</a></li>
+            <li style="margin-bottom:12px;"><a href="polityka-prywatnosci.html" style="color:var(--text-primary);font-size:1.1em;"><i class="fas fa-user-secret"></i> Polityka prywatności</a></li>
+        </ul>
+        <div style="margin-top:24px;text-align:center;">
+            <button onclick="hideMenuPanel()" class="popup-button" style="padding:8px 24px;font-size:1em;"><i class="fas fa-map-marked-alt"></i> Wróć do mapy</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Panel planowania -->
+<div id="planPanel" style="display:none; position:fixed; top:0; right:0; width:340px; height:100vh; background:var(--bg-secondary,#262626); z-index:3001; box-shadow:-4px 0 24px rgba(0,0,0,0.25); border-left:1px solid var(--border-color,#404040);">
+    <div style="padding:24px 18px 18px;">
+        <button onclick="hidePlanPanel()" style="position:absolute;top:12px;right:12px;font-size:20px;background:none;border:none;color:var(--text-secondary);cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h2 style="color:var(--accent,#99cc00);margin-bottom:18px;">Zaplanuj trasę</h2>
+        <form id="planPanelForm" autocomplete="off">
+            <label for="planFrom">Początek podróży:</label>
+            <input type="text" id="planFrom" name="from" placeholder="np. Rondo Kaponiera" required autocomplete="off">
+            <ul id="planFromAutocomplete" class="autocomplete-results"></ul>
+            <label for="planTo">Cel podróży:</label>
+            <input type="text" id="planTo" name="to" placeholder="np. Franowo" required autocomplete="off">
+            <ul id="planToAutocomplete" class="autocomplete-results"></ul>
+            <button type="submit" style="margin-top:18px;"><i class="fas fa-route"></i> Znajdź połączenie</button>
+        </form>
+        <div id="planPanelResult" style="margin-top:18px;display:none;background:var(--bg-tertiary,#333);border-radius:6px;padding:14px;"></div>
+        <a href="zaplanuj.html" style="display:block;margin-top:22px;color:var(--accent,#99cc00);text-align:center;">Pełny planer &rarr;</a>
+    </div>
+</div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.4.0/dist/protobuf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // --- JS (Minimalistyczny / Dark / MPK - z poprawkami i nową opcją stylu markera) ---
+        let map; let isMapInitialized = false; const markers = new Map(); const stopMarkers = new Map(); const stopData = new Map(); const vehicleData = new Map(); const tripData = new Map(); const routeData = new Map(); let isVehicleDataLoaded = false; const vehicleModelMap = new Map(); const previousPositions = new Map(); let vehicleCluster; let lineIndex = []; let taborIndex = []; let stopIndex = []; let favorites = JSON.parse(localStorage.getItem('favorites')) || { vehicles: [], stops: [] }; let alerts = JSON.parse(localStorage.getItem('alerts')) || []; let ztmAlerts = JSON.parse(localStorage.getItem('ztmAlerts')) || []; let stopTimesIndex = new Map(); let stopTimesByStopId = new Map(); let lastConnectionStatus = null; const vehicleStatusMap = { 0: "Approaching", 1: "AtStop", 2: "InTransit", null: "Unknown", undefined: "Unknown" }; let stopIcon; const defaultStopIconUrl = 'https://img.icons8.com/ios-glyphs/30/9e9e9e/bus-stop.png'; let areStopsVisible = true; let currentTheme = 'dark'; let currentRouteLayer = null; let locationMarker = null; const brigadeScheduleCache = new Map();
+
+        let vehicles = []; // Inicjalizacja zmiennej jako pustej tablicy
+
+        // <<< --- ZMIENNE DLA POWIADOMIENIA TRAMWAJU 941 --- >>>
+        let isTram941NotificationVisible = false; // Flaga śledząca widoczność powiadomienia
+        const tram941TaborNumber = '941';      // Numer taborowy tramwaju do śledzenia
+        const notificationTram941Id = 'notification-tram-941'; // Unikalne ID dla elementu powiadomienia
+        // <<< ------------------------------------------------- >>>
+
+        // <<< --- ZMIENNE DLA GRUPOWANIA --- >>>
+        const clusteringKey = 'farZoomClusteringEnabled';
+        let isFarZoomClusteringEnabled = true; // Domyślnie włączone (standardowe grupowanie)
+        // <<< ------------------------------------ >>>
+
+        // <<< --- NOWA ZMIENNA DLA STYLU MARKERA --- >>>
+        const markerStyleKey = 'vehicleMarkerStyle'; // Klucz localStorage
+        let currentMarkerStyle = 'icon'; // Domyślny styl ('icon' lub 'dot')
+        // <<< ---------------------------------------- >>>
+
+        let isTimeFormatEnabled = true; // Domyślnie włączone
+
+        // --- PRZYWRÓCONE FUNKCJE POMOCNICZE ---
+        function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) { if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity; const R = 6371e3; const phi1 = lat1 * Math.PI/180; const phi2 = lat2 * Math.PI/180; const deltaPhi = (lat2-lat1) * Math.PI/180; const deltaLambda = (lon2-lon1) * Math.PI/180; const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) + Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2); const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
+        function checkVehicleApproachingStop(vehicle, targetStopId) {
+            const cleanedTripId = vehicle?.trip?.tripId?.replace(/[\^ N\+].*$/, '');
+            const currentStopSequence = vehicle?.currentStopSequence;
+
+            if (!cleanedTripId || currentStopSequence === undefined || currentStopSequence === null || !stopTimesIndex.has(cleanedTripId)) {
+                return { isApproaching: false };
+            }
+
+            const tripStops = stopTimesIndex.get(cleanedTripId);
+            let targetStopSequence = -1;
+
+            for (const stop of tripStops) {
+                if (stop.stop_id === targetStopId) {
+                    targetStopSequence = parseInt(stop.stop_sequence);
+                    break;
+                }
+            }
+
+            if (targetStopSequence === -1) {
+                return { isApproaching: false };
+            }
+
+            // Dodano obsługę pojazdów na przystanku początkowym
+            if (currentStopSequence === targetStopSequence) {
+                return { isApproaching: true, sequenceDifference: 0 };
+            }
+
+            if (currentStopSequence > targetStopSequence) {
+                return { isApproaching: false };
+            }
+
+            return { isApproaching: true, sequenceDifference: targetStopSequence - currentStopSequence };
+        }
+        function estimateArrivalTime(distance, vehicleType) { const averageSpeedKmh = vehicleType === 'tram' ? 20 : 15; const speedMps = averageSpeedKmh * 1000 / 3600; if (speedMps <= 0) return Infinity; const timeSeconds = distance / speedMps; const timeMinutes = Math.max(0, Math.round(timeSeconds / 60)); if (timeMinutes === 0 && distance > 10) return "&lt;1"; if (timeMinutes === 0 && distance <= 10) return "0"; return timeMinutes.toString(); }
+        // --- KONIEC PRZYWRÓCONYCH FUNKCJI ---
+
+        async function loadVehicleModels() {  try { const response = await fetch('models.txt'); if (!response.ok) { console.warn(`[DEBUG] Failed models.txt: ${response.status}`); return; } const data = await response.text(); if (!data) { console.warn("[DEBUG] models.txt empty."); return; } if (typeof Papa === 'undefined') { console.error('[DEBUG] PapaParse missing!'); return; } Papa.parse(data, { header: true, skipEmptyLines: true, complete: function(results) { vehicleModelMap.clear(); results.data.forEach(row => { if (row.tabor_number) { vehicleModelMap.set(row.tabor_number.trim(), { model_name: row.model_name || "?", icon_url: row.icon_url || null }); } });  }, error: function(error) { console.error("[DEBUG] Error parsing models.txt:", error); } }); } catch (e) { console.error('[DEBUG] Error fetching models.txt:', e); } }
+
+        function toggleTheme() { currentTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; applyTheme(currentTheme); try { localStorage.setItem('theme', currentTheme); } catch(e){ console.error("LS theme save error:", e); } updateThemeToggleUI(); }
+        function updateThemeToggleUI() { const i = document.getElementById('theme-icon'); const t = document.getElementById('theme-text'); if(i && t){ if(currentTheme==='dark'){ i.className='fas fa-sun'; t.textContent='Tryb Jasny'; } else { i.className='fas fa-moon'; t.textContent='Tryb Ciemny'; } } }
+        function toggleSubmenu(e, id) { e.preventDefault(); e.stopPropagation(); const all=document.querySelectorAll('.submenu'); const sub=document.getElementById(id); const act=sub.classList.contains('active'); all.forEach(m=>{if(m.id !== id) m.classList.remove('active');}); if(sub) sub.classList.toggle('active'); }
+        document.addEventListener('click', e => { const subs=document.querySelectorAll('.submenu'); const btns=document.querySelectorAll('.bottom-bar a[onclick*="toggleSubmenu"]'); let btnClick=false; btns.forEach(b=>{if(b===e.target||b.contains(e.target))btnClick=true;}); let subClick=false; subs.forEach(m=>{if(m.classList.contains('active')&&m.contains(e.target))subClick=true;}); const modal=document.getElementById('brigadeScheduleModalContainer'); if(modal&&modal.parentElement.classList.contains('active')&&modal.contains(e.target))subClick=true; if(!btnClick&&!subClick)subs.forEach(m=>m.classList.remove('active')); });
+        function showSection(id) { document.querySelectorAll('.submenu').forEach(m=>m.classList.remove('active')); document.querySelectorAll('.bottom-bar a').forEach(a=>a.classList.remove('active')); const link=document.querySelector(`.bottom-bar a[onclick*="showSection('${id}')"]`); if(link)link.classList.add('active'); const mapEl=document.getElementById('map'); if(id==='map'){ if(mapEl)mapEl.style.display='block'; if(map&&isMapInitialized)setTimeout(()=>map.invalidateSize(),10);}else{ if(mapEl)mapEl.style.display='none'; if(id==='favorites')window.location.href='favorites.html'; else if(id==='alerts')window.location.href='alerts.html'; }}
+        function applyTheme(theme) { document.body.setAttribute('data-theme', theme); }
+        function displayRoute(rawTId) {
+            const cId = rawTId.replace(/[\^ N\+].*$/, ''); // Oczyszczenie ID kursu
+            if (currentRouteLayer) map.removeLayer(currentRouteLayer);
+            currentRouteLayer = null;
+
+            if (!cId) {
+                showNotification("warning", "Brak ID kursu.");
+                return;
+            }
+
+            if (typeof tripToShapeMap === 'undefined' || typeof shapesData === 'undefined') {
+                showNotification("error", "Brak danych tras.");
+                return;
+            }
+
+            const sId = tripToShapeMap.get(cId); // Pobranie shape_id na podstawie trip_id
+            if (!sId || sId === "null") {
+                showNotification("info", `Brak trasy dla ${cId}.`);
+                return;
+            }
+
+            const coords = shapesData[sId]; // Pobranie współrzędnych trasy
+            if (!coords || coords.length === 0) {
+                showNotification("warning", `Brak punktów trasy dla ${sId}.`);
+                return;
+            }
+
+            try {
+                const color = localStorage.getItem('lineColor') || '#8A2BE2'; // Domyślny kolor
+                const poly = L.polyline(coords, { color: color, weight: 4, opacity: 0.8 });
+                poly.addTo(map);
+                currentRouteLayer = poly;
+            } catch (e) {
+                console.error("Błąd rysowania trasy:", e);
+                showNotification("error", "Błąd rysowania trasy.");
+            }
+        }
+        function clearRouteOnClick() { if(currentRouteLayer && map) { map.removeLayer(currentRouteLayer); currentRouteLayer=null; } }
+        function locateUser() { if(!map)return; const btn=document.getElementById('locateBtn'); if(btn)btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>'; map.locate({setView:true,maxZoom:16,enableHighAccuracy:true}); }
+        function onLocationFound(e) { const r=e.accuracy/2; if(locationMarker && map) { map.removeLayer(locationMarker); } const color=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#8A2BE2'; locationMarker=L.circle(e.latlng,r,{color:color,fillColor:color,fillOpacity:0.2,weight:1}).addTo(map); const btn=document.getElementById('locateBtn'); if(btn)btn.innerHTML='<i class="fas fa-crosshairs"></i>'; if (map) map.stopLocate(); }
+        function onLocationError(e) { console.error("Location error:", e.message); showNotification("error",`Błąd lokalizacji: ${e.message}`); const btn=document.getElementById('locateBtn'); if(btn)btn.innerHTML='<i class="fas fa-crosshairs"></i>'; if (map) map.stopLocate(); }
+        try{const img=new Image(); img.src='stop.png'; img.onload=()=>{stopIcon=L.icon({iconUrl:'stop.png',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-12]});}; img.onerror=()=>{console.warn("stop.png not found, using default."); stopIcon=L.icon({iconUrl:defaultStopIconUrl,iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-12]});};}catch(e){console.error("Stop icon init error:", e); stopIcon=L.icon({iconUrl:defaultStopIconUrl,iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-12]});}
+
+        function initializeMap(){
+            if(isMapInitialized)return;
+            try{
+                map=L.map('map',{zoomControl:false,attributionControl:true}).setView([52.4064, 16.9252],13);
+                const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM contributors & ZTM Poznań & TwojaTrasa.online',maxZoom:19,tileSize:512,zoomOffset:-1});
+                osm.addTo(map);
+                const clusterOptions = {
+                    iconCreateFunction: function(c){
+                        let n=c.getChildCount(),s=n<10?'small':n<100?'medium':'large';
+                        return L.divIcon({
+                            html:`<div><span>${n}</span></div>`,
+                            className:`marker-cluster marker-cluster-${s}`,
+                            iconSize:L.point(30,30)
+                        });
+                    },
+                    spiderfyOnMaxZoom:false,
+                    showCoverageOnHover:false,
+                    zoomToBoundsOnClick:true,
+                    removeOutsideVisibleBounds:true,
+                    animate:false, // Animacje mogą powodować problemy przy częstych aktualizacjach
+                    maxClusterRadius: isFarZoomClusteringEnabled ? 20 : 0 // Użyj zmiennej odczytanej z LS
+                };
+                vehicleCluster = L.markerClusterGroup(clusterOptions);
+                map.addLayer(vehicleCluster);
+                map.on('locationfound',onLocationFound);
+                map.on('locationerror',onLocationError);
+                map.on('click',clearRouteOnClick);
+                map.attributionControl.setPrefix(false); // Usuń prefix 'Leaflet |'
+                setTimeout(()=>{ if (map) map.invalidateSize(); },100); // Upewnij się, że rozmiar mapy jest poprawny
+                isMapInitialized=true;
+            } catch(e){
+                console.error("Map initialization error:",e);
+                showNotification("error","Błąd inicjalizacji mapy.");
+                isMapInitialized=false;
+            }
+        }
+
+        async function initializeData() {
+            try {
+                await Promise.all([
+                    loadRoutes(),
+                    loadTrips(),
+                    loadStopTimes(),
+                    loadStops()
+                ]);
+                console.log("Dane zostały załadowane.");
+            } catch (error) {
+                console.error("Błąd ładowania danych:", error);
+            }
+        }
+
+        async function loadStaticFile(url) {
+            try {
+                const response = await fetch(url); // Zmieniono 'r' na 'response'
+                if (!response.ok) throw Error(`HTTP ${response.status}`);
+                const text = await response.text(); // Zmieniono 't' na 'text'
+                if (!text && response.status === 200) {
+                    console.warn(`Empty file: ${url}`);
+                } else if (!text) {
+                    throw Error('Empty file response');
+                }
+                return text;
+            } catch (e) {
+                console.error(`Failed loading ${url}:`, e);
+                throw e;
+            }
+        }
+
+        async function parseCsvData(text, fileName) {  return new Promise((resolve, reject) => { if (typeof Papa === 'undefined') return reject(new Error('PapaParse library is missing')); Papa.parse(text, { header: true, skipEmptyLines: true, complete: res => { if(res.errors.length > 0) console.warn(`Parsing errors in ${fileName}:`, res.errors); resolve(res.data); }, error: err => reject(new Error(`Parsing error in ${fileName}: ${err}`)) }); }); }
+        async function loadRoutes() { try{const t=await loadStaticFile('routes.txt');const d=await parseCsvData(t,'routes.txt');routeData.clear();d.forEach(r=>{if(r.route_id)routeData.set(r.route_id,{shortName:r.route_short_name||'?',longName:r.route_long_name||'',type:r.route_type?parseInt(r.route_type):3});}); console.log(`[DEBUG] Loaded ${routeData.size} routes.`);}catch(e){ console.error("[DEBUG] Failed to load routes:", e); throw e;} }
+        async function loadTrips() { try{const t=await loadStaticFile('trips.txt');const d=await parseCsvData(t,'trips.txt');tripData.clear();d.forEach(t=>{if(t.trip_id)tripData.set(t.trip_id.replace(/[\^ N\+].*$/,''),{route_id:t.route_id,trip_headsign:t.trip_headsign||"?"});}); console.log(`[DEBUG] Loaded ${tripData.size} trips.`);}catch(e){ console.error("[DEBUG] Failed to load trips:", e); throw e;} }
+        async function loadStops() { try{const t=await loadStaticFile('stops.txt');const d=await parseCsvData(t,'stops.txt');stopData.clear();d.forEach(s=>{const lat=parseFloat(s.stop_lat),lon=parseFloat(s.stop_lon);if(!isNaN(lat)&&!isNaN(lon)&&s.stop_id)stopData.set(s.stop_id,{name:s.stop_name||`?(${s.stop_id})`,lat,lon,code:s.stop_code||null});}); console.log(`[DEBUG] Loaded ${stopData.size} stops.`);}catch(e){ console.error("[DEBUG] Failed to load stops:", e); throw e;} }
+        async function loadStopTimes() { try{const t=await loadStaticFile('stop_times.txt');const d=await parseCsvData(t,'stop_times.txt');stopTimesIndex.clear();stopTimesByStopId.clear();d.forEach(r=>{const cId=r.trip_id?.replace(/[\^ N\+].*$/,'');if(!cId||!r.stop_id||r.stop_sequence===undefined)return;const seq=parseInt(r.stop_sequence);if(isNaN(seq))return;const entry={stop_id:r.stop_id,stop_sequence:seq,arrival_time:r.arrival_time||null,departure_time:r.departure_time||null,trip_id:cId};if(!stopTimesIndex.has(cId))stopTimesIndex.set(cId,[]);stopTimesIndex.get(cId).push(entry);if(!stopTimesByStopId.has(r.stop_id))stopTimesByStopId.set(r.stop_id,[]);stopTimesByStopId.get(r.stop_id).push(entry);});stopTimesIndex.forEach(s=>s.sort((a,b)=>a.stop_sequence-b.stop_sequence));stopTimesByStopId.forEach(e=>e.sort((a,b)=>(a.departure_time||a.arrival_time||"99:").localeCompare(b.departure_time||b.arrival_time||"99:"))); console.log(`[DEBUG] Loaded ${stopTimesIndex.size} trip schedules.`);}catch(e){ console.error("[DEBUG] Failed to load stop_times:", e); throw e;} }
+
+        function getVehicleIconUrl(tabor, type) { const bus='https://img.icons8.com/color/48/000000/bus.png'; const tram='https://img.icons8.com/ios-filled/50/ffdd00/train.png'; if(!tabor)return type==='tram'?tram:bus; const model=vehicleModelMap.get(tabor); return model?.icon_url||(type==='tram'?tram:bus);}
+
+        function determineDirection(lat1,lon1,lat2,lon2) { if(lat2===undefined||lon2===undefined||(lat1===lat2&&lon1===lon2))return null; const R=6371e3; const p1=lat1*Math.PI/180, p2=lat2*Math.PI/180, dL=(lon2-lon1)*Math.PI/180; const y=Math.sin(dL)*Math.cos(p2); const x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dL); return(Math.atan2(y,x)*180/Math.PI+360)%360;}
+
+        // --- NOWA FUNKCJA DO TWORZENIA IKONY MARKERA (kropka lub ikona pojazdu) ---
+        // --- Z POPRAWKĄ NA ODBICIE LUSTRZANE ZAMIAST OBROTU ---
+        function getVehicleMarkerIcon(tabor, vType, dirId, lat, lon, lineShortName) {
+            if (currentMarkerStyle === 'dot') {
+                // --- Styl Kropki z Numerem Linii ---
+                const lineText = lineShortName || '?';
+                const isTram = vType === 'tram';
+                // Używamy zmiennych CSS do kolorów
+                const bgColor = isTram
+                    ? getComputedStyle(document.documentElement).getPropertyValue('--accent-yellow').trim() || '#ffdd00'
+                    : getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#8A2BE2';
+                let textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-on-accent').trim() || '#1a1a1a';
+
+                // Opcjonalnie: Poprawka koloru tekstu dla jasnego motywu i żółtego tła tramwaju
+                if (currentTheme === 'light' && isTram) {
+                    // textColor = '#333333'; // Przykład
+                }
+                const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#404040';
+
+
+                const markerHtml = `
+                    <div class="vehicle-dot-marker" style="background-color: ${bgColor}; color: ${textColor}; border-color: ${borderColor};">
+                        <span>${lineText}</span>
+                    </div>
+                `;
+
+                return L.divIcon({
+                    html: markerHtml,
+                    className: 'vehicle-dot-icon-container',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+            } else {
+                // --- Istniejący Styl Ikony Pojazdu ---
+                const url = getVehicleIconUrl(tabor, vType);
+                const prev = previousPositions.get(tabor);
+                let style = ''; // Inicjalizuj styl jako pusty string
+                if (prev && (lat !== prev.lat || lon !== prev.lon)) {
+                    const bear = determineDirection(prev.lat, prev.lon, lat, lon); // Kierunek z poprzedniego do obecnego punktu
+                    if (bear !== null) {
+                        // ZASTOSUJ ODBICIE ZAMIAST OBROTU:
+                        // Jeśli kierunek (bearing) jest pomiędzy 90 a 270 stopni (czyli generalnie na zachód/południe/południowy-zachód),
+                        // zastosuj odbicie lustrzane w poziomie.
+                        if (bear > 90 && bear <= 270) {
+                                style = 'transform: scaleX(-1);'; // Odbicie lustrzane w poziomie
+                        }
+                        // ZAKOMENTOWANA LUB USUNIĘTA LINIA Z OBROTEM:
+                        // style = `transform: rotate(${bear}deg);`;
+                    }
+                }
+                const now = Date.now();
+                if (!prev || lat !== prev.lat || lon !== prev.lon || (now - (prev.timestamp || 0) > 30000)) {
+                    previousPositions.set(tabor, { lat, lon, timestamp: now });
+                }
+                return L.divIcon({
+                    html: `<img src="${url}" style="${style}width:100%;height:100%;object-fit:contain;">`,
+                    className: 'vehicle-icon-container',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+            }
+        }
+
+        function determineVehicleType(rId, tabor) { const route=routeData.get(rId); if(route&&route.type!==undefined)return(route.type===0||route.type===1||route.type===2)?"tram":"bus"; if(!tabor)return"bus"; return parseInt(tabor)<1000?"tram":"bus";}
+        function getVehicleModel(tabor) { return vehicleModelMap.get(tabor)?.model_name || "?"; }
+        function getVehicleStatus(s) { return vehicleStatusMap[s]||"?";}
+        function getLineWithBrigade(rId, label) { return label?.includes('/')?label:(routeData.get(rId)?.shortName||rId||"?");}
+
+        function calculateDelay(v) {
+            const cId = v?.trip?.tripId?.replace(/[\^ N\+].*$/, '');
+            const ts = v?.timestamp ? parseInt(v.timestamp, 10) : undefined;
+            const seq = v?.currentStopSequence;
+            const stat = v?.currentStatus;
+
+            if (!cId || !ts || isNaN(ts) || seq === undefined || seq === null || !stopTimesIndex.has(cId)) {
+                console.warn("Brakujące dane w calculateDelay:", { cId, ts, seq, stopTimesIndexHasCId: stopTimesIndex.has(cId) });
+                return { status: "?", delay: null, diffSeconds: null, formattedDiff: null };
+            }
+
+            const stops = stopTimesIndex.get(cId);
+            const stop = stops.find(s => s.stop_sequence === seq);
+            if (!stop) {
+                console.warn("Nie znaleziono przystanku w stopTimesIndex:", { cId, seq });
+                return { status: "?", delay: null, diffSeconds: null, formattedDiff: null };
+            }
+
+            const time = stat === 1 ? stop.departure_time : stop.arrival_time;
+            if (!time || !/^\d{1,2}:\d{2}:\d{2}$/.test(time)) {
+                console.warn("Nieprawidłowy czas zaplanowany:", { time, stat });
+                return { status: "?", delay: null, diffSeconds: null, formattedDiff: null };
+            }
+
+            try {
+                const [h, m, s] = time.split(':').map(Number);
+                const curr = new Date(ts * 1000);
+                const sched = new Date(curr);
+                sched.setHours(h, m, s, 0);
+
+                if (sched.getTime() < curr.getTime() - 43200000) {
+                    sched.setDate(sched.getDate() + 1);
+                } else if (sched.getTime() > curr.getTime() + 43200000) {
+                    sched.setDate(sched.getDate() - 1);
+                }
+
+                const diff = Math.round((curr.getTime() - sched.getTime()) / 1000);
+                const delay = Math.round(diff / 60);
+
+                if (Math.abs(delay) > 120) {
+                    console.warn(`Nieprawidłowa różnica czasu: ${delay} min dla pojazdu ${v.vehicle?.id}`, {
+                        cId,
+                        seq,
+                        time,
+                        curr: curr.toISOString(),
+                        sched: sched.toISOString(),
+                        diff
+                    });
+                    return { status: "?", delay: null, diffSeconds: null, formattedDiff: null };
+                }
+
+                const formattedDiff = isTimeFormatEnabled
+                    ? `${delay >= 0 ? '+' : '-'}${String(Math.abs(Math.floor(diff / 60))).padStart(2, '0')}:${String(Math.abs(diff % 60)).padStart(2, '0')}`
+                    : null;
+
+                let status;
+                if (delay > 0) {
+                    status = `${delay} min opóźniony`;
+                } else if (delay < 0) {
+                    status = `${Math.abs(delay)} min przed czasem`;
+                } else {
+                    status = "Zgodnie z rozkładem";
+                }
+
+                return { status: status, delay: delay, diffSeconds: diff, formattedDiff: formattedDiff };
+            } catch (e) {
+                console.error("Delay calc error:", e, "Time:", time);
+                return { status: "!", delay: null, diffSeconds: null, formattedDiff: null };
+            }
+        }
+
+        function addMinutesToTimeString(time, mins) { if(!time||typeof time!=='string'||!/^\d{1,2}:\d{2}(:\d{2})?$/.test(time)||typeof mins!=='number'||isNaN(mins))return null; try{const p=time.split(':'); let h=parseInt(p[0],10),m=parseInt(p[1],10); if(isNaN(h)||isNaN(m)||m<0||m>59){if(h>=24&&!isNaN(h)&&!isNaN(m)&&m>=0&&m<=59){let tot=h*60+m+mins; let newT=tot%(1440); let finM=(newT<0)?newT+1440:newT; let newH=Math.floor(finM/60); let newM=finM%60; return `${String(newH).padStart(2,'0')}:${String(newM).padStart(2,'0')}`;} return null;} const d=new Date(0); d.setUTCHours(h,m,p[2]?parseInt(p[2],10):0,0); d.setUTCMinutes(d.getUTCMinutes()+mins); return `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`;}catch(e){console.error("addMinutes error:", e); return null;}}
+        function debounce(func, wait) { let timeout; return function(...args){const later=()=>{clearTimeout(timeout); func.apply(this,args);}; clearTimeout(timeout); timeout=setTimeout(later,wait);};}
+        function indexData() {
+    try {
+        const lines = new Map();
+        tripData.forEach((t, tid) => {
+            const rInfo = routeData.get(t.route_id);
+            const line = rInfo?.shortName || '?';
+            const key = `${line}-${t.trip_headsign || '?'}`;
+            if (!lines.has(key) && line !== '?') lines.set(key, { routeId: line, headsign: t.trip_headsign || "?" });
+        });
+        lineIndex = Array.from(lines.values());
+
+        stopIndex = Array.from(stopData, ([sid, s]) => ({
+            stopId: sid,
+            name: s.name,
+            code: s.code
+        }));
+
+        taborIndex = Array.from(vehicleData, ([vid, v]) => {
+            const taborNumber = v.vehicle?.id;
+            if (!taborNumber) return null; // Pomijamy pojazdy bez numeru taborowego
+            return {
+                vehicleId: vid,
+                               taborNumber: taborNumber,
+                line: routeData.get(v.trip?.routeId)?.shortName || '?',
+                destination: tripData.get(v.trip?.tripId)?.trip_headsign || '?'
+            };
+        }).filter(Boolean); // Usuwamy wartości null
+    } catch (e) {
+        console.error("[DEBUG] Indexing error:", e);
+    }
+}
+        const debouncedUpdateStopMarkers = debounce(updateStopMarkers, 300); // Utwórz zdebounce'owaną funkcję raz
+        function updateStopMarkers() {
+    if (!map || !isMapInitialized || !areStopsVisible) return;
+    const zoom = map.getZoom();
+    if (zoom < 15) {
+        stopMarkers.forEach(m => { if (map.hasLayer(m)) map.removeLayer(m); });
+        stopMarkers.clear();
+        return;
+    }
+    const added = new Set();
+    const toRemove = [];
+    stopData.forEach((s, sid) => {
+        if (s.lat && s.lon) { // USUNIĘTO sprawdzanie bounds!
+            added.add(sid);
+            if (!stopMarkers.has(sid)) {
+                if (!stopIcon) { console.warn("Stop icon not loaded yet."); return; }
+                const marker = L.marker([s.lat, s.lon], { icon: stopIcon, opacity: 0.8 }).bindPopup(() => {
+                    const fav = favorites.stops.some(f => f.stopId === sid);
+                    const popupContent = `
+                        <div class="popup-header">
+                            <div class="main-info">
+                                <span class="title">${s.name}</span>
+                                <span class="subtitle">ID: ${sid}${s.code ? ' / ' + s.code : ''}</span>
+                            </div>
+                            <div class="actions">
+                                <span class="favorite-icon ${fav ? 'favorite' : ''}" onclick="toggleFavorite('stop', '${sid}', this)" aria-label="Ulubione">
+                                    ${fav ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="popup-section">
+                            <div class="popup-section-title">Linie</div>
+                            <div id="lines-${sid}">Ładowanie...</div>
+                        </div>
+                        <div class="popup-section">
+                            <div class="popup-section-title">Odjazdy na żywo</div>
+                            <ul id="departures-${sid}" class="departure-list">
+                                <li>Ładowanie...</li>
+                            </ul>
+                        </div>
+                    `;
+                    return popupContent;
+                }, { maxWidth: 320, minWidth: 280 }).on('popupopen', () => updateDeparturesForPopup(sid));
+                marker.addTo(map);
+                stopMarkers.set(sid, marker);
+            }
+        }
+    });
+    stopMarkers.forEach((m, sid) => { if (!added.has(sid)) { toRemove.push(sid); } });
+    toRemove.forEach(sid => {
+        const marker = stopMarkers.get(sid);
+        if (marker && map.hasLayer(marker)) { map.removeLayer(marker); }
+        stopMarkers.delete(sid);
+    });
+}
+        // --- ZMODYFIKOWANA Funkcja updateDeparturesForPopup ---
+        async function updateDeparturesForPopup(stopId) {
+            const departuresListElement = document.getElementById(`departures-${stopId}`);
+            const linesDivElement = document.getElementById(`lines-${stopId}`);
+            if (!departuresListElement || !linesDivElement) { console.error(`[DEBUG Popup ${stopId}] Error: Missing DOM elements for popup.`); return; }
+
+            departuresListElement.innerHTML = '<li>Ładowanie odjazdów...</li>'; linesDivElement.innerHTML = 'Ładowanie linii...';
+
+            if (!stopData.size || !stopTimesByStopId.size || !tripData.size || !routeData.size) { console.error(`[DEBUG Popup ${stopId}] Error: Static data maps (stops, stopTimes, trips, routes) are empty!`); departuresListElement.innerHTML = '<li class="no-results">Błąd ładowania danych statycznych.</li>'; linesDivElement.innerHTML = 'Błąd'; return; }
+
+            const stopInfo = stopData.get(stopId);
+            if (!stopInfo) { console.error(`[DEBUG Popup ${stopId}] Error: No stop info found for ID: ${stopId}.`); departuresListElement.innerHTML = '<li class="no-results">Błąd ID przystanku.</li>'; linesDivElement.innerHTML = 'Błąd'; return; }
+
+            // Linie obsługujące przystanek
+            try {
+                const lines = new Map();
+                const entries = stopTimesByStopId.get(stopId) || [];
+                entries.forEach(st => {
+                    const t = tripData.get(st.trip_id); // trip_id jest już oczyszczony w loadStopTimes
+                    if (t?.route_id) {
+                        const r = routeData.get(t.route_id);
+                        if (r?.shortName && r.shortName !== '?') lines.set(r.shortName, r.type); // Pomijamy linie bez numeru
+                    }
+                });
+                const sLines = Array.from(lines.keys()).sort((a, b) => { const nA = parseInt(a), nB = parseInt(b); return !isNaN(nA) && !isNaN(nB) ? nA - nB : !isNaN(nA) ? -1 : !isNaN(nB) ? 1 : a.localeCompare(b); });
+                if (sLines.length > 0) linesDivElement.innerHTML = sLines.map(ln => { const type = lines.get(ln); let cls = type === 0 || type === 1 || type === 2 ? 'tram' : type === 3 ? 'bus' : 'unknown'; return `<span class="line-badge ${cls}">${ln}</span>`; }).join(' ');
+                else linesDivElement.innerHTML = '<span style="color:var(--text-tertiary);">Brak linii</span>';
+            } catch (e) { console.error(`[DEBUG Popup ${stopId}] Error generating lines list:`, e); linesDivElement.innerHTML = '<span style="color:var(--danger-color);">Błąd linii</span>'; }
+
+            // Odjazdy (TYLKO RT)
+            const departures = [];
+            const now = new Date();
+            const rtCovered = new Set(); // Zbiór trip_id, które mają dane RT
+            let rtFound = 0; // Nie potrzebujemy już schFound
+
+            try {
+                // 1. Odjazdy Real-Time (RT)
+                if (isVehicleDataLoaded && vehicleData.size > 0) {
+                    vehicleData.forEach((vehicle, vehicleId) => {
+                        const { isApproaching } = checkVehicleApproachingStop(vehicle, stopId);
+                        if (isApproaching) {
+                            rtFound++;
+                            const lat = vehicle.position?.latitude;
+                                  lon = vehicle.position?.longitude;
+                                  cId = vehicle.trip?.tripId?.replace(/[\^ N\+].*$/, '');
+                                  rId = vehicle.trip?.routeId;
+                                  tabor = vehicle.vehicle?.id;
+
+                            if (lat && lon && cId && rId && tabor) {
+                                const route = routeData.get(rId);
+                                const line = route?.shortName || rId;
+                                const vType = route ? (route.type === 0 || route.type === 1 || route.type === 2 ? 'tram' : 'bus') : determineVehicleType(rId, tabor);
+                                const dist = getDistanceFromLatLonInMeters(stopInfo.lat, stopInfo.lon, lat, lon);
+                                const arrMins = estimateArrivalTime(dist, vType);
+
+                                let disp = '?', sort = new Date(now.getTime() + 999 * 60000);
+                                if (!isNaN(parseInt(arrMins))) {
+                                    let m = parseInt(arrMins);
+                                    disp = m === 0 ? 'Odjazd teraz' : `~ ${m} min`; // Dodano obsługę "Odjazd teraz"
+                                    sort = new Date(now.getTime() + m * 60000);
+                                } else if (arrMins === '<1' || arrMins === '0') {
+                                    disp = '< 1 min';
+                                    sort = new Date(now.getTime() + 30000);
+                                }
+
+                                const trip = tripData.get(cId) || {};
+                                const dest = trip.trip_headsign || "?";
+                                let currStop = '';
+                                if (vehicle.currentStopSequence !== undefined) {
+                                    const vStops = stopTimesIndex.get(cId);
+                                    const vCurr = vStops?.find(s => s.stop_sequence === vehicle.currentStopSequence);
+                                    if (vCurr) {
+                                        const vS = stopData.get(vCurr.stop_id);
+                                        currStop = vS ? `(z: ${vS.name})` : '(z: ?)';
+                                    }
+                                }
+
+                                departures.push({
+                                    type: 'rt',
+                                    sortTime: sort,
+                                    displayTime: disp,
+                                    line,
+                                    lineType: vType,
+                                    destination: dest,
+                                    tabor,
+                                    vehicleStop: currStop,
+                                    tripId: cId
+                                });
+                                rtCovered.add(cId);
+                            }
+                        }
+                    });
+                }
+
+                // 2. Odjazdy Rozkładowe (Scheduled) - USUNIĘTO LOGIKĘ DODAWANIA
+                // Pętla entriesSch.forEach nadal istnieje w oryginalnym kodzie, ale jej zawartość
+                // (w szczególności linia departures.push({... type: 'sch' ...})) została zakomentowana/usunięta.
+                // Poniżej przykład z zakomentowaną logiką:
+                /*
+                const maxMinutesInFuture = 90;
+                const entriesSch = stopTimesByStopId.get(stopId) || [];
+                entriesSch.forEach(stEntry => {
+                    const cId = stEntry.trip_id;
+                    if (!rtCovered.has(cId)) {
+                        const depTime = stEntry.departure_time || stEntry.arrival_time;
+                        if (depTime) {
+                            const sched = parseScheduledTime(depTime, now);
+                            if (sched && sched >= now && (sched.getTime() - now.getTime()) <= maxMinutesInFuture * 60000) {
+                                const t = tripData.get(cId);
+                                const rId = t?.route_id;
+                                if (t && rId) {
+                                    const r = routeData.get(rId);
+                                    const l = r?.shortName || rId;
+                                    const vT = r ? (r.type === 0 || r.type === 1 || r.type === 2 ? 'tram' : 'bus') : determineVehicleType(rId, null);
+                                    // departures.push({ type: 'sch', sortTime: sched, displayTime: depTime.substring(0, 5), line: l, lineType: vT, destination: t.trip_headsign || "?", tabor: null, vehicleStop: '', tripId: cId });
+                                }
+                            }
+                        }
+                    }
+                });
+                */
+
+            } catch (e) { console.error(`[DEBUG Popup ${stopId}] Error processing departures (RT):`, e); } // Zaktualizowano komunikat błędu
+
+            // --- Deduplikacja odjazdów RT ---
+            // Ten krok jest nadal ważny, aby uniknąć duplikatów, jeśli ten sam pojazd
+            // zostałby z jakiegoś powodu przetworzony wielokrotnie w pętli RT.
+            try {
+                const uniqueRtTripIds = new Set();
+                const uniqueDepartures = [];
+
+                for (const dep of departures) {
+                    // Sprawdzamy tylko typ 'rt', bo innych nie ma
+                    if (dep.type === 'rt') {
+                        if (!uniqueRtTripIds.has(dep.tripId)) {
+                            uniqueDepartures.push(dep);
+                            uniqueRtTripIds.add(dep.tripId);
+                        }
+                        // else { console.log(`[DEBUG Popup ${stopId}] Skipping duplicate RT for tripId: ${dep.tripId}`); }
+                    }
+                }
+
+                departures.length = 0;
+                departures.push(...uniqueDepartures);
+
+            } catch(e) {
+                console.error(`[DEBUG Popup ${stopId}] Error deduplicating RT departures:`, e);
+            }
+            // --- KONIEC Deduplikacji ---
+
+
+            // Wyświetlanie odjazdów (tylko RT)
+            try {
+                departures.sort((a, b) => a.sortTime - b.sortTime);
+                if (departures.length > 0) {
+                    let html = departures.slice(0, 8).map(dep => { // Pokaż max 8 odjazdów RT
+                        let cls = dep.lineType === 'tram' ? 'tram' : dep.lineType === 'bus' ? 'bus' : 'unknown';
+                        const gps = dep.tabor ? `<span class="gps-link" onclick="event.stopPropagation();showVehicleOnMap('${dep.tabor}')">(GPS)</span>` : '';
+                        return `<li class="rt">` + // Zawsze klasa 'rt'
+                                    `<div class="dep-line-dest">` +
+                                        `<span class="dep-line-badge-dest"><span class="line-badge ${cls}">${dep.line}</span> ${dep.destination} ${gps}</span>` +
+                                        `${dep.vehicleStop ? `<span class="vehicle-current-stop">${dep.vehicleStop}</span>` : ''}` +
+                                    `</div>` +
+                                    `<div class="dep-time-details">` +
+                                        `<span class="dep-time rt-time">${dep.displayTime}</span>` + // Zawsze klasa 'rt-time'
+                                        `<span class="dep-details">Nr ${dep.tabor}</span>` +
+                                    `</div>` +
+                                `</li>`;
+                    }).join('');
+                    departuresListElement.innerHTML = html;
+                } else {
+                    // Ten komunikat pojawi się, jeśli nie ma żadnych odjazdów RT
+                    departuresListElement.innerHTML = '<li class="no-departures">Obecnie brak dostępnych pojazdów z aktywnym GPS.</li>';
+                }
+            } catch (e) {
+                console.error(`[DEBUG Popup ${stopId}] Error sorting/rendering final RT departures:`, e);
+                departuresListElement.innerHTML = '<li class="no-results">Błąd wyświetlania odjazdów</li>';
+            }
+        } // Koniec zmodyfikowanej funkcji updateDeparturesForPopup
+
+
+        function parseScheduledTime(time, ref) { if(!time||!/^\d{1,2}:\d{2}:\d{2}$/.test(time))return null; try{const p=time.split(':').map(Number); let h=p[0],m=p[1],s=p[2]; if(isNaN(h)||isNaN(m)||isNaN(s)||m>59||s>59)return null; const d=new Date(ref); let days=0; if(h>=24){days=Math.floor(h/24); h%=24;} d.setHours(h,m,s,0); if(days>0)d.setDate(d.getDate()+days); const refM=new Date(ref.getTime()-21600000); /* Check if time is > 6h ago (handle day change) */ if(d<refM&&days===0)d.setDate(d.getDate()+1); return d;}catch(e){console.error("parseScheduledTime error:", e); return null;}}
+        function performSearch() {
+    const query = document.getElementById('mapSearchInput')?.value?.toLowerCase().trim() || '';
+    if (query.length < 2) return;
+
+    if (!lineIndex || !taborIndex || !stopIndex || lineIndex.length === 0) {
+        showNotification('error', 'Indeksowanie danych nie zostało ukończone.');
+        return;
+    }
+
+    try {
+        // Wyszukiwanie w liniach
+        const matchingLines = lineIndex.filter(line =>
+            (line.routeId || '').toLowerCase().includes(query) ||
+            (line.headsign || '').toLowerCase().includes(query)
+        ).slice(0, 5);
+
+        // Wyszukiwanie w przystankach
+        const matchingStops = stopIndex.filter(stop =>
+            (stop.name || '').toLowerCase().includes(query) ||
+            (stop.code || '').toLowerCase().includes(query)
+        ).slice(0, 5);
+
+        // Wyszukiwanie w numerach taborowych pojazdów
+        const matchingVehicles = taborIndex.filter(vehicle =>
+            (vehicle.taborNumber || '').toLowerCase().includes(query)
+        ).slice(0, 5);
+
+        // Tworzenie wyników
+        const results = [
+            ...matchingLines.map(line => `<li onclick="filterVehiclesByRoute('${line.routeId}')">Linia: ${line.routeId} - ${line.headsign}</li>`),
+            ...matchingStops.map(stop => `<li onclick="showStopOnMap('${stop.stopId}')">Przystanek: ${stop.name}</li>`),
+            ...matchingVehicles.map(vehicle => `<li onclick="showVehicleOnMap('${vehicle.taborNumber}')">Pojazd: ${vehicle.taborNumber}</li>`)
+        ];
+
+        // Wyświetlanie wyników
+        const resultsContainer = document.getElementById('autocompleteResults');
+        resultsContainer.innerHTML = results.length > 0 ? results.join('') : '<li>Brak wyników</li>';
+    } catch (e) {
+        console.error('Błąd wyszukiwania:', e);
+        showNotification('error', 'Błąd wyszukiwania.');
+    }
+}
+
+        function updateFavoriteCount() {
+    // Jeśli nie chcesz licznika, zostaw pustą
+}
+        function toggleFavorite(type, id, el) { event.stopPropagation(); let isFav=false; let name="?"; try { if(type==='vehicle'){const i=favorites.vehicles.findIndex(f=>f.vehicleId===id); const v=vehicleData.get(id); name=`Pojazd ${v?.vehicle?.id||id}`; if(i>-1){favorites.vehicles.splice(i,1);isFav=false;}else{if(v){const t=v.vehicle?.id||'?'; const cId=v.trip?.tripId?.replace(/[\^ N\+].*$/,''); const rId=v.trip?.routeId||"?"; const rInfo=routeData.get(rId); const l=rInfo?.shortName||rId; const dest=tripData.get(cId)?.trip_headsign||"?"; favorites.vehicles.push({vehicleId:id,taborNumber:t,line:l,destination:dest}); isFav=true;}else{showNotification("warning", "Nie można dodać do ulubionych - brak danych pojazdu."); return;}}}else if(type==='stop'){const i=favorites.stops.findIndex(f=>f.stopId===id); const s=stopData.get(id); name=`Przystanek ${s?.name||id}`; if(i>-1){favorites.stops.splice(i,1);isFav=false;}else{if(s){favorites.stops.push({stopId:id,name:s.name||"?",code:s.code}); isFav=true;}else{showNotification("warning", "Nie można dodać do ulubionych - brak danych przystanku."); return;}}} if(el){el.classList.toggle('favorite',isFav); const icon=el.querySelector('i'); if(icon)icon.className=isFav?'fas fa-star':'far fa-star';} localStorage.setItem('favorites',JSON.stringify(favorites)); /* updateFavoriteCount(); - Licznik ukryty */ showNotification("info",`${name} ${isFav?'dodano do':'usunięto z'} ulubionych.`); } catch(e) { console.error("Favorite toggle error:", e); showNotification("error", "Błąd zapisu ulubionych."); } }
+        updateFavoriteCount();
+        function toggleFavoriteRoute(routeId, stopId, dest) {
+    let favRoutes = [];
+    try { favRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]'); } catch(e){}
+    const idx = favRoutes.findIndex(fr => fr.routeId === routeId);
+    if (idx > -1) {
+        favRoutes.splice(idx, 1);
+        showNotification('info', `Usunięto trasę ${routeId} z ulubionych.`);
+    } else {
+        favRoutes.push({ routeId, stopId, dest });
+        showNotification('success', `Dodano trasę ${routeId} do ulubionych.`);
+    }
+    localStorage.setItem('favoriteRoutes', JSON.stringify(favRoutes));
+}
+        function showVehicleOnMap(tabor, retry=0) { if(!isMapInitialized||(!isVehicleDataLoaded&&retry<8)){setTimeout(()=>showVehicleOnMap(tabor,retry+1),500); return;} let vId=null, vData=null; for(let[id,d] of vehicleData)if(d.vehicle?.id===tabor){vId=id; vData=d; break;} const marker=markers.get(vId); if(marker&&vData?.position?.latitude&&map){map.setView([vData.position.latitude,vData.position.longitude],Math.max(map.getZoom(),16)); setTimeout(()=>{try{ if(vehicleCluster&&map.hasLayer(marker))vehicleCluster.zoomToShowLayer(marker,()=>marker?.openPopup()); else if(map.hasLayer(marker))marker?.openPopup();} catch(e) { console.error("Error showing vehicle layer/popup:", e); }},100); try { const url=new URL(window.location); url.searchParams.delete('pojazd'); window.history.replaceState({},'',url); } catch(e) { console.error("History API error:", e); }}else{if(retry>=8){showNotification("error",`Nie znaleziono pojazdu ${tabor} na mapie.`); try { const url=new URL(window.location); url.searchParams.delete('pojazd'); window.history.replaceState({},'',url); } catch(e) { console.error("History API error:", e); }}}}
+        function showStopOnMap(sid) { if(!isMapInitialized){setTimeout(()=>showStopOnMap(sid),500); return;} const stop=stopData.get(sid); if(stop?.lat&&stop.lon&&map){map.setView([stop.lat,stop.lon],Math.max(map.getZoom(),16)); updateStopMarkers(); setTimeout(()=>{const marker=stopMarkers.get(sid); if(marker)marker.openPopup(); else showNotification("warning",`Przybliż mapę, aby zobaczyć przystanek ${sid}.`); try { const url=new URL(window.location); url.searchParams.delete('przystanek'); window.history.replaceState({},'',url); } catch(e) { console.error("History API error:", e); }},100);}else{showNotification("error",`Nie znaleziono danych dla przystanku ${sid}.`); try { const url=new URL(window.location); url.searchParams.delete('przystanek'); window.history.replaceState({},'',url); } catch(e) { console.error("History API error:", e); }}}
+        function getQueryParams() { try { return new URLSearchParams(window.location.search); } catch(e) { console.error("Error parsing URL params:", e); return new URLSearchParams(); } }
+        function hideLoader(){ const l=document.getElementById('loader'); if(l){l.style.opacity='0'; setTimeout(()=>l.style.display='none',300);}}
+        function acceptAllCookies() { try{localStorage.setItem('cookieConsent',JSON.stringify({a:1,t:Date.now()})); const el=document.getElementById('cookieConsent'); if(el) el.style.display='none';}catch(e){showNotification("error","Błąd zapisu ustawień ciasteczek.");}}
+        function showCookieConsent() { try{if(!localStorage.getItem('cookieConsent')){const el=document.getElementById('cookieConsent'); if(el) el.style.display='flex';}}catch(e){console.error("LS cookie check error:", e); const el=document.getElementById('cookieConsent'); if(el) el.style.display='flex';}}
+        function showNotification(type, msg, dur=4000) {
+    const cont=document.getElementById('notificationContainer');
+    if(!cont)return;
+    const div=document.createElement('div');
+    div.className=`notification ${type}`;
+    let icon='';
+    switch(type){
+        case'success':icon='check-circle';break;
+        case'warning':icon='exclamation-triangle';break;
+        case'error':icon='times-circle';break;
+        default:icon='info-circle';div.classList.add('info');break;
+    }
+    div.innerHTML=`<i class="fas fa-${icon} icon"></i><span>${msg}</span><button class="close-btn" onclick="this.parentElement.remove()">✕</button>`;
+    cont.prepend(div);
+    if (dur > 0) {
+        setTimeout(() => {
+            if (div.parentElement) {
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(-10px)';
+                setTimeout(() => div.remove(), 500);
+            }
+        }, dur);
+    }
+}
+        async function fetchVehicleData(){ try{const r=await fetch('proxy.php',{cache:'no-store'}); if(!r.ok)throw Error(`HTTP ${r.status}`); const buf=await r.arrayBuffer(); if(!protobuf)throw Error("Biblioteka ProtobufJS nie jest załadowana."); if(buf.byteLength===0){console.warn("Empty response from proxy.php"); return{message:{entity:[]}};} const root=await protobuf.load("gtfs-realtime.proto"); const Feed=root.lookupType("transit_realtime.FeedMessage"); const decoded = Feed.decode(new Uint8Array(buf)); return{message: Feed.toObject(decoded, { defaults: true }) };}catch(e){if(lastConnectionStatus!=='error')showNotification("error",`Błąd pobierania danych GPS: ${e.message}`); lastConnectionStatus='error'; console.error("fetchVehicleData error:", e); return{message:null};}}
+        function formatTripStopsHTML(stops, seq, v) { if(!stops||stops.length===0)return'<li>Brak danych o przystankach na trasie.</li>'; let delay=null, dTxt=''; if(v){const d=calculateDelay(v); if(d&&d.delay!==null){delay=d.delay; if(d.delay>1)dTxt=`<span style="color: var(--danger-color);">(+${d.delay})</span>`; else if(d.delay<-1)dTxt=`<span style="color: var(--ok-color);">(${d.delay})</span>`;}} stops.sort((a,b)=>a.stop_sequence-b.stop_sequence); let html='', curr=false; stops.forEach(s=>{ const info=stopData.get(s.stop_id); const name=info?info.name:`Nieznany (${s.stop_id})`; const arr=s.arrival_time, dep=s.departure_time; const dArr=arr?arr.substring(0,5):'--', dDep=dep?dep.substring(0,5):'--'; let cls='', icon='', time='', est=''; if(s.stop_sequence<seq){cls='passed'; time=`<div class="scheduled-time">${dArr}${dDep!=='--'&&dDep!==dArr?'-'+dDep:''}</div><div class="status-details">Był</div>`;} else {if(!curr&&s.stop_sequence>=seq){cls='current'; curr=true; icon=' <i class="fas fa-map-marker-alt" style="color:var(--accent);"></i>';}else{cls='future';} time=`<div class="scheduled-time">${dArr}${dDep!=='--'&&dDep!==dArr?'-'+dDep:''}</div>`; if(delay!==null&&arr){const estStr=addMinutesToTimeString(arr,delay); if(estStr)est=`<div class="estimated-time">Szac. ${estStr} ${dTxt}</div>`; else if(dTxt)est=`<div class="status-details">${dTxt}</div>`;}else if(dTxt)est=`<div class="status-details">${dTxt}</div>`; time+=est;} html+=`<li class="${cls}"><div class="stop-details"><span class="stop-name">${name}${icon}</span><span class="stop-sequence">(${s.stop_sequence})</span></div><div class="time-info">${time}</div></li>`;}); return `<ul class="trip-stop-list">${html}</ul>`;}
+        function showTripSchedule(e, vId, cId) { e.stopPropagation(); const marker=markers.get(vId); const v=vehicleData.get(vId); if(!marker||!v||!cId){showNotification("error","Brak danych pojazdu do wyświetlenia trasy.");return;} const stops=stopTimesIndex.get(cId); const seq=v.currentStopSequence!==undefined?v.currentStopSequence:0; if(!stops){showNotification("warning",`Brak danych o przystankach dla kursu ${cId}.`);return;} const html=formatTripStopsHTML(stops,seq,v); const popup=marker.getPopup(); if(popup){if(!marker.originalPopupContent)marker.originalPopupContent=popup.getContent(); const back=`<div class="popup-button-group"><button class="popup-button secondary" onclick="restoreOriginalPopupContent('${vId}')"><i class="fas fa-arrow-left"></i> Wróć do informacji</button></div>`; const rInfo = routeData.get(v.trip?.routeId); const lineNum = rInfo?.shortName || v.trip?.routeId || '?'; const content=`<div class="popup-header"><div class="main-info"><span class="title">Trasa Linii ${lineNum}</span><span class="subtitle">Kurs: ${cId}</span></div></div>${html}${back}`; popup.setContent(content); popup.update(); setTimeout(()=>{const pEl=popup.getElement(); if(pEl){const list=pEl.querySelector('.trip-stop-list'); const curr=list?.querySelector('.current'); if(curr&&list){const lh=list.clientHeight, eh=curr.offsetHeight, et=curr.offsetTop-list.offsetTop; list.scrollTo({top:et-(lh/2)+(eh/2), behavior:'smooth'});}}},100);}else{showNotification("error","Błąd: Nie można uzyskać dostępu do okna popup.");}}
+        function restoreOriginalPopupContent(vId) { const m=markers.get(vId); if(m&&m.originalPopupContent){const p=m.getPopup(); if(p){p.setContent(m.originalPopupContent); p.update();}}}
+        async function showBrigadeSchedule(e, brig) { e.stopPropagation(); if(!brig||brig==="?"){showNotification("info","Brak numeru brygady dla tego pojazdu."); return;} const modal=document.getElementById('brigadeScheduleModalOverlay'); const content=document.getElementById('brigadeScheduleModalContent'); const title=document.getElementById('brigadeScheduleModalTitle'); if(!modal||!content||!title) { console.error("Brygada modal elements not found."); return; } title.textContent=`Rozkład Brygady ${brig}`; content.innerHTML='<p style="text-align:center;"><i class="fas fa-spinner fa-spin fa-2x"></i></p>'; modal.classList.add('active'); try{let html=brigadeScheduleCache.get(brig); if(!html){const data=await fetchBrigadeScheduleData(brig); html=formatBrigadeScheduleHTML(data,brig); brigadeScheduleCache.set(brig,html);} content.innerHTML=html;}catch(e){ console.error("Error fetching/formatting brigade schedule:", e); content.innerHTML=`<p style="color:var(--danger-color);text-align:center;">Błąd ładowania rozkładu brygady: ${e.message}</p>`; }}
+        function closeBrigadeModal() { const m=document.getElementById('brigadeScheduleModalOverlay'); if(m)m.classList.remove('active');}
+        // --- MOCK: Ta funkcja wymagałaby prawdziwego backendu ---
+        async function fetchBrigadeScheduleData(brig) { console.warn(`MOCK: Fetching schedule for brigade ${brig}`); await new Promise(r=>setTimeout(r,800)); /* Symulacja opóźnienia sieciowego */
+            // Przykładowe dane - dostosuj do prawdziwej struktury, jeśli ją masz
+            if (["A008", "T012"].includes(brig)) {
+                return {
+                    brigade: brig,
+                    date: new Date().toLocaleDateString('pl'),
+                    trips: [
+                        { type: "trip", startTime: "04:48", endTime: "05:30", from: "Franowo", to: "Unii Lubelskiej", line: "1", duration: 42, distance: 8.5, tripId: "TRIP_1_A" },
+                        { type: "break", startTime: "05:30", endTime: "05:35", duration: 5, location: "Unii Lubelskiej" },
+                        { type: "trip", startTime: "05:35", endTime: "06:15", from: "Unii Lubelskiej", to: "Budziszyńska", line: "1", duration: 40, distance: 8.0, tripId: "TRIP_1_B" },
+                        { type: "trip", startTime: "06:20", endTime: "07:00", from: "Budziszyńska", to: "Unii Lubelskiej", line: "1", duration: 40, distance: 8.0, tripId: "TRIP_1_C" },
+                        { type: "break", startTime: "07:00", endTime: "07:20", duration: 20, location: "Unii Lubelskiej (dłuższa)" },
+                        { type: "trip", startTime: "07:20", endTime: "08:05", from: "Unii Lubelskiej", to: "Franowo", line: "1", duration: 45, distance: 8.5, tripId: "TRIP_1_D" },
+                    ],
+                    detailsUrl: null // Opcjonalny link do zewnętrznego źródła
+                };
+            } else if (brig === "B101") {
+                return { brigade: brig, date: new Date().toLocaleDateString('pl'), trips: [ { type: "info", text: "Brygada całodzienna" } ], detailsUrl: null };
+            } else {
+                throw Error(`Brak przykładowych danych dla brygady ${brig}.`);
+            }
+        }
+        function formatBrigadeScheduleHTML(data, brig) { if(!data?.trips?.length)return'<p style="text-align:center;color:var(--text-secondary);">Brak danych o kursach dla tej brygady.</p>'; let html=`<div style="padding:0 10px 10px;display:flex;justify-content:flex-end;gap:10px;">${data.detailsUrl?`<a href="${data.detailsUrl}" target="_blank" rel="noopener" class="popup-button secondary"><i class="fas fa-info-circle"></i> Szczegóły</a>`:''}<button class="popup-button secondary" onclick="alert('Funkcja niezaimplementowana.');"><i class="fas fa-map-marker-alt"></i> Pokaż trasę dnia</button></div>`; html+='<ul class="brigade-schedule-timeline" style="padding-left:0; list-style-type: none;">'; let isFirst = true; data.trips.forEach(item =>{ if (isFirst) { isFirst = false; } else { html += '<li style="height: 10px; border-left: 2px solid var(--border-color); margin-left: 7px;"></li>'; /* Linia łącząca */ } if(item.type ==='break'){ html+=`<li class="brigade-schedule-item break" style="padding-left:15px; position: relative;"><div style="position: absolute; left: 0; top: 4px; width: 15px; height: 15px; background-color: var(--bg-tertiary); border-radius: 50%; border: 2px solid var(--border-color);"></div><strong><i class="fas fa-coffee" style="margin-right: 5px; color: var(--text-secondary);"></i> Przerwa ${item.duration} min</strong> ${item.location ? `(${item.location})` : ''}<span style="font-size:0.9em;color:var(--text-secondary);display:block;">${item.startTime} - ${item.endTime || '?'}</span></li>`; } else if (item.type === 'trip') { html+=`<li class="brigade-schedule-item" style="padding-left:15px; position: relative;"><div style="position: absolute; left: 0; top: 4px; width: 15px; height: 15px; background-color: var(--accent); border-radius: 50%; border: 2px solid var(--bg-secondary);"></div><strong>${item.startTime} ${item.from} <i class="fas fa-long-arrow-alt-right" style="color:var(--text-secondary);"></i> ${item.to} (Linia ${item.line})</strong><span style="font-size:0.9em;color:var(--text-secondary);display:block;"><i class="far fa-clock"></i> ${item.duration||'?'} min | <i class="fas fa-road"></i> ${item.distance||'?'} km</span><a href="#" style="font-size:0.85em;color:var(--accent);" onclick="event.preventDefault();alert('Szczegóły kursu: ${item.tripId || 'brak ID'}');">Szczegóły kursu</a></li>`; } else if (item.type === 'info') { html += `<li style="padding-left: 15px; color: var(--text-secondary); font-style: italic;">${item.text}</li>`; } }); html+='</ul>'; return html;}
+
+        async function loadVehicleDictionary() {
+            try {
+                const response = await fetch('vehicle_dictionary.txt');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const text = await response.text();
+                const rows = text.split('\n').slice(1); // Pomijamy nagłówek
+                const vehicleData = new Map();
+
+                rows.forEach(row => {
+                    const [vehicle, ramp, hf_lf_le, air_conditioner, place_for_transp_bicycles, voice_announcement_sys, ticket_machine, ticket_sales_by_the_driver, usb_charger] = row.split(',');
+                    if (vehicle) {
+                        vehicleData.set(vehicle.trim(), {
+                            ramp: parseInt(ramp),
+                            hf_lf_le: parseInt(hf_lf_le),
+                            air_conditioner: parseInt(air_conditioner),
+                            place_for_transp_bicycles: parseInt(place_for_transp_bicycles),
+                            voice_announcement_sys: parseInt(voice_announcement_sys),
+                            ticket_machine: parseInt(ticket_machine),
+                            ticket_sales_by_the_driver: parseInt(ticket_sales_by_the_driver),
+                            usb_charger: parseInt(usb_charger)
+                        });
+                    }
+                });
+
+                return vehicleData;
+            } catch (error) {
+                console.error('Error loading vehicle dictionary:', error);
+                return new Map();
+            }
+        }
+
+        function generateAdditionalInfo(vehicleId, vehicleDictionary) {
+            const vehicleInfo = vehicleDictionary.get(vehicleId);
+
+            if (!vehicleInfo) return '<p>Brak dodatkowych informacji o pojeździe.</p>';
+
+            const infoMap = [
+                { key: 'hf_lf_le', label: 'Typ pojazdu', values: { 0: 'Wysokopodłogowy', 1: 'Niskopodłogowy', 2: 'Częściowo niskopodłogowy' } },
+                { key: 'ramp', label: 'Podjazd dla wózków' },
+                
+                { key: 'air_conditioner', label: 'Klimatyzacja' },
+                { key: 'place_for_transp_bicycles', label: 'Przewóz rowerów' },
+                { key: 'voice_announcement_sys', label: 'System zapowiedzi głosowych' },
+                { key: 'ticket_machine', label: 'Biletomat' },
+                { key: 'ticket_sales_by_the_driver', label: 'Sprzedaż biletów u kierowcy' },
+                { key: 'usb_charger', label: 'Ładowarka USB' }
+            ];
+
+            let additionalInfoHtml = '<div class="popup-section"><div class="popup-section-title">Dodatkowe informacje</div><ul>';
+
+            infoMap.forEach(info => {
+                const value = vehicleInfo[info.key];
+                if (value === 1 || (info.values && info.values[value])) {
+                    const displayValue = info.values ? info.values[value] : ''; // Jeśli są wartości opisowe, użyj ich
+                    additionalInfoHtml += `<li>${info.label}${displayValue ? `: ${displayValue}` : ''}</li>`;
+                }
+            });
+
+            additionalInfoHtml += '</ul></div>';
+            return additionalInfoHtml;
+        }
+
+        async function updateVehicleDataLoop() {
+            const vehicleDictionary = await loadVehicleDictionary();
+
+            const { message } = await fetchVehicleData();
+            if (!message) {
+setTimeout(updateVehicleDataLoop, 15000);
+return; // Błąd pobierania, spróbuj ponownie
+}
+
+            const entities = message.entity || [];
+            const vehicles = entities.filter(e => e.vehicle?.position && e.id) || [];
+            ztmAlerts = entities.filter(e => e.alert).map(e => ({
+                title: e.alert?.headerText?.translation?.[0]?.text || 'Alert',
+                description: e.alert?.descriptionText?.translation?.[0]?.text || 'Brak opisu',
+                url: e.alert?.url?.translation?.[0]?.text || null,
+                cause: e.alert?.cause || null,
+                effect: e.alert?.effect || null,
+                informedEntities: e.alert?.informedEntity || []
+            })) || [];
+            try { localStorage.setItem('ztmAlerts', JSON.stringify(ztmAlerts)); } catch(e){ console.error("LS ztmAlerts save error:", e); }
+
+            if(vehicles.length === 0 && isVehicleDataLoaded){if(lastConnectionStatus!=='slow'){showNotification("warning","Brak aktywnych pojazdów w danych GPS."); lastConnectionStatus='slow';} alerts=[]; try{ localStorage.setItem('alerts','[]'); } catch(e){} setTimeout(updateVehicleDataLoop,15000); return;}
+            else if(vehicles.length === 0 && !isVehicleDataLoaded){console.warn("Initial data fetch returned 0 vehicles."); isVehicleDataLoaded=true; indexData(); setTimeout(updateVehicleDataLoop,15000); return;}
+
+            if(lastConnectionStatus !== 'ok'){if(lastConnectionStatus)showNotification("success","Połączenie GPS przywrócone.",2000);lastConnectionStatus='ok';}
+
+            const currentIds = new Set();
+            const newAlerts = [];
+            vehicles.forEach(e => {
+                try {
+                    const v = e.vehicle;
+                    const id = e.id;
+                    const tabor = v.vehicle?.id;
+                    const lat = v.position?.latitude;
+                    const lon = v.position?.longitude;
+                    const ts = v.timestamp ? parseInt(v.timestamp, 10) : undefined;
+
+                    if (!lat || !lon || lat < 52.2 || lat > 52.6 || lon < 16.6 || lon > 17.2) return;
+
+                    currentIds.add(id);
+                    vehicleData.set(id, v);
+                    const rawTId = v.trip?.tripId;
+                    const cId = rawTId?.replace(/[\^ N\+].*$/, '');
+					
+					if (lat !== undefined && lon !== undefined && ts !== undefined) {
+						updateVehicleTripPosition(id, lat, lon, ts, cId || null); // Przekaż tripId
+					}
+
+                    const rId = v.trip?.routeId || "?";
+                    const dirId = v.trip?.directionId;
+                    const label = v.vehicle?.label;
+                    const vType = determineVehicleType(rId, tabor);
+
+                    const rInfo = routeData.get(rId);
+                    const lineShortName = rInfo?.shortName || '?';
+
+                    const tInfo = cId ? tripData.get(cId) : null;
+                    const dest = tInfo?.trip_headsign || "?";
+                    const model = tabor ? getVehicleModel(tabor) : "?";
+                    const delayData = calculateDelay(v) || { status: "?", delay: null, formattedDiff: null };
+                    const dStatus = delayData.status;
+                    const formattedDiff = delayData.formattedDiff;
+
+                    const statusText = isTimeFormatEnabled && formattedDiff
+                        ? `${dStatus} (${formattedDiff})`
+                        : dStatus;
+
+                    const lineBrig = getLineWithBrigade(rId, label);
+                    let brig = "?"; if(label?.includes('/'))brig = label.split('/')[1]?.trim() || "?";
+
+                    if(delayData.delay !== null && delayData.delay > 5){
+                        const stopInfo = v.stopId && stopData.has(v.stopId) ? stopData.get(v.stopId) : null;
+                        newAlerts.push({ vehicleId: id, line: lineBrig, destination: dest, stopName: stopInfo ? stopInfo.name : null, delay: delayData.delay, taborNumber: tabor });
+                    }
+
+                    const icon = getVehicleMarkerIcon(tabor, vType, dirId, lat, lon, lineShortName); // Wywołanie poprawionej funkcji
+                    const headIcon = getVehicleIconUrl(tabor, vType);
+                    const isFav = favorites.vehicles.some(f => f.vehicleId === id || (tabor && f.taborNumber === tabor));
+                    const star = `<span class="favorite-icon ${isFav ? 'favorite' : ''}" onclick="toggleFavorite('vehicle','${id}',this)" aria-label="Ulub.">${isFav ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'}</span>`;
+                    const rBtn = rawTId ? `<button class="popup-button" onclick="displayRoute('${rawTId}')"><i class="fas fa-route"></i> Trasa</button>` : '';
+                    const trailBtn = `<button class="popup-button secondary" onclick="showVehicleTrail('${id}')"><i class="fas fa-shoe-prints"></i> Historia kursu</button>`;
+                    const sBtn = cId && stopTimesIndex.has(cId) ? `<button class="popup-button secondary" onclick="showTripSchedule(event,'${id}','${cId}')"><i class="fas fa-list-ol"></i> Przyst.</button>` : '';
+                    const bBtn = brig !== '?' ? `<button class="popup-button secondary" onclick="showBrigadeSchedule(event,'${brig}')"><i class="fas fa-calendar-alt"></i> Bryg.</button>` : ''; // Pokaż tylko jeśli brygada jest znana
+                    const saveRouteButton = `<button class="popup-button secondary" onclick="toggleFavoriteRoute('${rId}', '${v.stopId}', '${dest}')">
+    <i class="fas fa-heart"></i> Zapisz trasę
+</button>`;
+
+                    // Generowanie dodatkowych informacji o pojeździe
+                    const additionalInfo = generateAdditionalInfo(tabor, vehicleDictionary);
+
+                    // Dodanie dodatkowych informacji do popupu
+                    const pCont = `
+                        <div class="popup-header">
+                            <div class="main-info">
+                                <span class="title">
+                                    <img src="${headIcon}" alt="${vType}" style="width:18px;height:18px;vertical-align:-2px;margin-right:5px;">
+                                    Linia/Brygada: ${lineBrig}
+                                </span>
+                                <span class="subtitle">${dest}</span>
+                            </div>
+                            <div class="actions">${star}</div>
+                        </div>
+                        <div class="popup-details popup-section">
+                            <dl>
+                                <dt>Nr taborowy:</dt><dd>${tabor || '?'}</dd>
+                                <dt>Model:</dt><dd>${model}</dd>
+                                <dt>Status:</dt><dd>${statusText}</dd>
+                                <dt>Prędkość:</dt><dd>${v.position.speed ? (v.position.speed * 3.6).toFixed(0) + ' km/h' : 'Brak danych'}</dd>
+                                <dt>Aktualizacja:</dt><dd>${ts ? new Date(ts * 1000).toLocaleTimeString('pl', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '?'}</dd>
+                            </dl>
+                        </div>
+                        ${additionalInfo}
+                        <div class="popup-button-group">
+                            ${rBtn}${sBtn}${bBtn}${trailBtn}${saveRouteButton}
+                        </div>
+                    `;
+
+                    const marker = markers.get(id);
+                    if (marker) {
+                        if (marker.getLatLng().lat !== lat || marker.getLatLng().lng !== lon) {
+                            marker.setLatLng([lat, lon]);
+                        }
+                        // Sprawdź, czy ikona się zmieniła (np. przez zmianę stylu w ustawieniach LUB przez zmianę kierunku)
+                        // Porównujemy HTML, bo obiekt L.divIcon jest tworzony na nowo za każdym razem
+                        if (!marker.options.icon || marker.options.icon.options.html !== icon.options.html) {
+                             marker.setIcon(icon);
+                        }
+                        const currP = marker.getPopup()?.getContent();
+                        const isTrip = currP?.includes('class="trip-stop-list"');
+                        if (!marker.isPopupOpen() || !isTrip) {
+                            if (marker.originalPopupContent !== pCont) {
+                                marker.setPopupContent(pCont);
+                                marker.originalPopupContent = pCont;
+								setupTrailMarkerEvents(marker);
+                            }
+                        } else {
+                            if (!marker.originalPopupContent) marker.originalPopupContent = pCont;
+                        }
+                    } else {
+                        if (vehicleCluster) { // Upewnij się, że klaster istnieje
+                            const newM = L.marker([lat, lon], { icon }).bindPopup(pCont, { maxWidth: 320 });
+                            newM.originalPopupContent = pCont;
+							setupTrailMarkerEvents(newM);
+                            vehicleCluster.addLayer(newM);
+                            markers.set(id, newM);
+                        } else {
+                            console.warn("Vehicle cluster not ready, cannot add marker yet.");
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Error processing vehicle ${e?.id}:`, err);
+                }
+            });
+
+            markers.forEach((m, id) => {
+                 if (!currentIds.has(id)) {
+                     if (vehicleCluster && vehicleCluster.hasLayer(m)) {
+                         vehicleCluster.removeLayer(m);
+                     } else if (map && map.hasLayer(m)) { // Awaryjnie, jeśli marker nie był w klastrze
+                         map.removeLayer(m);
+                     }
+                     markers.delete(id);
+                     const v = vehicleData.get(id);
+                     if (v?.vehicle?.id) previousPositions.delete(v.vehicle.id);
+					 removeVehicleHistory(id);
+                     vehicleData.delete(id);
+                 }
+            });
+
+            alerts = newAlerts;
+            isVehicleDataLoaded = true;
+            indexData();
+            try { localStorage.setItem('alerts', JSON.stringify(alerts)); } catch(e){ console.error("LS alerts save error:", e); }
+
+            // <<< --- Logika powiadomienia o tramwaju 941 --- >>>
+            let isTram941Active = false;
+            for (const vehicleInfo of vehicleData.values()) {
+                if (vehicleInfo.vehicle?.id === tram941TaborNumber) {
+                    isTram941Active = true;
+                    break;
+                }
+            }
+            const notificationContainer = document.getElementById('notificationContainer');
+            if (isTram941Active && !isTram941NotificationVisible && notificationContainer) {
+                if (!document.getElementById(notificationTram941Id)) {
+                    const notificationElement = document.createElement('div');
+                    notificationElement.id = notificationTram941Id;
+                    notificationElement.className = 'notification info';
+                    notificationElement.style.order = "-1"; // Pokaż na górze
+                    notificationElement.innerHTML = `
+                        <i class="fas fa-tram icon"></i>
+                        <span>
+                            <b>[NOWOŚĆ]</b> Tramwaj (${tram941TaborNumber}) <b>Moderus Gamma LF 04 AC BD</b> jest dostępny.
+                            <a href="#" onclick="showVehicleOnMap('${tram941TaborNumber}'); return false;" style="color: inherit; text-decoration: underline; font-weight: bold;">Pokaż na mapie</a>
+                        </span>
+                        <button class="close-btn" onclick="this.parentElement.remove(); isTram941NotificationVisible = false;">✕</button>
+                    `;
+                    notificationContainer.appendChild(notificationElement);
+                    isTram941NotificationVisible = true;
+                }
+            } else if (!isTram941Active && isTram941NotificationVisible) {
+                const existingNotification = document.getElementById(notificationTram941Id);
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                isTram941NotificationVisible = false;
+            }
+            // <<< --------------------------------------------- >>>
+
+
+            const params=getQueryParams();
+            if(params.has('pojazd')&&!window.vehicleShownFromUrl){showVehicleOnMap(params.get('pojazd'));window.vehicleShownFromUrl=true}
+            if(params.has('przystanek')&&!window.stopShownFromUrl){showStopOnMap(params.get('przystanek'));window.stopShownFromUrl=true}
+
+            const activeFilter = localStorage.getItem('activeVehicleFilter') || 'all';
+if (activeFilter === 'route') {
+    const routeId = localStorage.getItem('activeRouteId');
+    if (routeId) filterVehiclesByRoute(routeId);
+    else filterVehicles('all');
+} else if (activeFilter === 'favoriteRoutes') {
+    filterVehiclesByFavoriteRoutes();
+} else {
+    filterVehicles(activeFilter);
+}
+
+            console.log('Ulubione trasy:', JSON.parse(localStorage.getItem('favoriteRoutes')));
+
+            setTimeout(updateVehicleDataLoop, 15000); // Ustaw następne wywołanie
+        }
+
+        window.vehicleData = new Map(); // Inicjalizacja globalnej zmiennej
+
+        window.addEventListener('online',()=> {showNotification("success","Połączenie internetowe przywrócone.",2000);lastConnectionStatus='ok';if(!isVehicleDataLoaded)updateVehicleDataLoop();});
+        window.addEventListener('offline',()=> {console.warn("Offline.");showNotification("error","Brak połączenia z internetem.");lastConnectionStatus='offline'});
+
+        document.addEventListener('DOMContentLoaded', async ()=>{
+            setLoaderText('Inicjalizacja mapy...');
+            console.log('%cHej! Widzę, że interesuje Cię kod tej strony :) Jeśli masz pytania lub chcesz dowiedzieć się więcej, dołącz do Discorda tutaj: https://discord.gg/tWRdJDRBX3. Więcej informacji o projekcie znajdziesz na https://TwojaTrasa.online/about.html', 'font-size: 16px; font-weight: bold; color: #99cc00;');
+
+            const startT=Date.now(); window.vehicleShownFromUrl=false; window.stopShownFromUrl=false;
+            try{
+                // Wczytaj motyw
+                const savedTheme=localStorage.getItem('theme');
+                if(savedTheme==='light'||savedTheme==='dark')currentTheme=savedTheme; else currentTheme='dark';
+                applyTheme(currentTheme);
+                updateThemeToggleUI();
+
+                // Wczytaj widoczność przystanków
+                const stopsVis=localStorage.getItem('stopsVisible');
+                if(stopsVis!==null)areStopsVisible=(stopsVis==='true');
+
+                // Wczytaj zapisane ustawienie grupowania
+                const savedClustering = localStorage.getItem(clusteringKey);
+                if (savedClustering !== null) isFarZoomClusteringEnabled = (savedClustering === 'true');
+
+                // <<< --- NOWE: Wczytaj ustawienie stylu markera --- >>>
+                const savedMarkerStyle = localStorage.getItem(markerStyleKey);
+                if (savedMarkerStyle === 'icon' || savedMarkerStyle === 'dot') {
+                    currentMarkerStyle = savedMarkerStyle;
+                } else {
+                    currentMarkerStyle = 'icon'; // Domyślny, jeśli nic nie zapisano lub wartość jest niepoprawna
+                }
+                console.log(`[DEBUG] Initial marker style: ${currentMarkerStyle}`);
+                // <<< ----------------------------------------------- >>>
+
+                // Wczytaj zapisane ustawienie formatu czasu
+                const savedTimeFormat = localStorage.getItem('timeFormatEnabled');
+                isTimeFormatEnabled = savedTimeFormat === null ? true : savedTimeFormat === 'true';
+                updateTimeFormatToggleUI();
+
+                setLoaderText('Inicjalizacja mapy...');
+                initializeMap(); // <-- mapa od razu
+                setLoaderText('Ładowanie danych GPS...');
+                updateVehicleDataLoop(); // <-- GPS od razu
+            
+
+    // Dalej ładuj dane statyczne w tle, zmieniając napisy:
+                setLoaderText('Ładowanie rozkładów linii...');
+                await loadRoutes();
+
+                setLoaderText('Ładowanie kursów...');
+                await loadTrips();
+
+                setLoaderText('Ładowanie przystanków...');
+                await loadStops();
+                updateStopMarkers()
+
+                setLoaderText('Ładowanie godzin odjazdów...');
+                await loadStopTimes();
+
+                setLoaderText('Ładowanie modeli pojazdów...');
+                await loadVehicleModels();
+
+                setLoaderText('Finalizacja i przygotowanie mapy...');
+                // ...tu np. initializeMap(), indexData(), updateStopMarkers() itd.
+                updateStopMarkers();
+                
+                setLoaderText('Prawie gotowe...');
+                // ...ostatnie rzeczy
+
+                hideLoader(); // Ukryj loader na końcu
+                showCookieConsent();
+                updateVehicleDataLoop();
+            } catch(err){
+                console.error("[DEBUG] FATAL INITIALIZATION ERROR:",err);
+                hideLoader();
+                showNotification("error","Błąd krytyczny aplikacji.");
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeFilter = localStorage.getItem('activeVehicleFilter') || 'all';
+            if (activeFilter === 'route') {
+                const routeId = localStorage.getItem('activeRouteId');
+                if (routeId) filterVehiclesByRoute(routeId);
+                else filterVehicles('all');
+            } else if (activeFilter === 'favoriteRoutes') {
+                filterVehiclesByFavoriteRoutes();
+            } else {
+                filterVehicles(activeFilter);
+            }
+        });
+
+        document.addEventListener('visibilitychange',()=> { if(document.visibilityState==='visible'&&map&&isMapInitialized) setTimeout(()=>map.invalidateSize({debounceMoveend:true}),100); });
+
+        function updateAutocompleteResults(query) {
+            const resultsContainer = document.getElementById('autocompleteResults');
+            if (!query || query.length < 2) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+
+            const matchingLines = lineIndex.filter(line =>
+                line.routeId.toLowerCase().includes(query) || line.headsign.toLowerCase().includes(query)
+            ).slice(0, 5);
+
+            const matchingStops = stopIndex.filter(stop =>
+                stop.name.toLowerCase().includes(query) || (stop.code && stop.code.toLowerCase().includes(query))
+            ).slice(0, 5);
+
+            const matchingVehicles = taborIndex.filter(vehicle =>
+                vehicle.taborNumber.toLowerCase().includes(query)
+            ).slice(0, 5);
+
+            const results = [
+                ...matchingLines.map(line => `<li onclick="filterVehiclesByRoute('${line.routeId}')">Linia: ${line.routeId} - ${line.headsign}</li>`),
+                ...matchingStops.map(stop => `<li onclick="showStopOnMap('${stop.stopId}')">Przystanek: ${stop.name}</li>`),
+                ...matchingVehicles.map(vehicle => `<li onclick="showVehicleOnMap('${vehicle.taborNumber}')">Pojazd: ${vehicle.taborNumber}</li>`)
+            ];
+
+            resultsContainer.innerHTML = results.length > 0 ? results.join('') : '<li>Brak wyników</li>';
+        }
+
+        // Obsługa wpisywania w polu wyszukiwania
+        const searchInput = document.getElementById('mapSearchInput');
+        searchInput.addEventListener('input', debounce(() => {
+            const query = searchInput.value.toLowerCase().trim();
+            updateAutocompleteResults(query);
+        }, 300));
+
+        function updateTimeFormatToggleUI() {
+            const toggleTimeFormatElement = document.querySelector('#toggleTimeFormatBtn');
+            if (!toggleTimeFormatElement) return;
+
+            const icon = toggleTimeFormatElement.querySelector('i.icon');
+            const status = toggleTimeFormatElement.querySelector('.status-indicator');
+
+            if (isTimeFormatEnabled) {
+                icon.className = 'fas fa-clock icon';
+                status.textContent = 'Włączony';
+            } else {
+                icon.className = 'fas fa-times-circle icon';
+                status.textContent = 'Wyłączony';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleTimeFormatElement = document.querySelector('#toggleTimeFormatBtn');
+            if (toggleTimeFormatElement) {
+                toggleTimeFormatElement.addEventListener('click', () => {
+                    isTimeFormatEnabled = !isTimeFormatEnabled;
+                    localStorage.setItem('timeFormatEnabled', isTimeFormatEnabled.toString());
+                    updateTimeFormatToggleUI();
+                });
+            }
+
+            // Wczytaj zapisane ustawienie
+            const savedTimeFormat = localStorage.getItem('timeFormatEnabled');
+            isTimeFormatEnabled = savedTimeFormat === null ? true : savedTimeFormat === 'true';
+            updateTimeFormatToggleUI();
+        });
+
+        
+        // --- SYSTEM ESTYMATY FAKE GPS ---
+
+let fakeGpsLines = [];
+let fakeGpsSchedules = {};
+let estimatedMarkers = {};
+
+// Pobierz listę linii z estymatą
+fetch('/data/fake_gps_lines.json')
+    .then(r => r.ok ? r.json() : [])
+    .then(arr => {
+        fakeGpsLines = arr;
+        // Pobierz rozkład dla każdej linii (obsługa brygad)
+        arr.forEach(line => {
+            fetch(`../data/fake_gps_schedules/${line.replace('/', '_')}.json`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => { if (data) fakeGpsSchedules[line] = data; });
+        });
+    });
+
+// Pomocnicza funkcja do zamiany czasu na minuty
+function timeToMinutes(t) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+}
+
+// Funkcja do generowania ikony estymaty z obsługą własnej ikonki z JSON
+function getFakeGpsMarkerIcon(line) {
+    // Pobierz ikonę z rozkładu, jeśli jest
+    let iconUrl = 'https://img.icons8.com/color/48/000000/bus.png'; // domyślna
+    const schedule = fakeGpsSchedules[line];
+    if (schedule && schedule.icon) {
+        iconUrl = schedule.icon;
+    }
+    return L.divIcon({
+        html: `<img src="${iconUrl}" style="width:100%;height:100%;object-fit:contain;">`,
+        className: 'vehicle-icon-container',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+}
+
+// Funkcja do generowania popupu estymaty w stylu pojazdów
+function getFakeGpsPopupContent(line, pos, schedule) {
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    // Pobierz ikonę z rozkładu, jeśli jest
+    let iconUrl = 'https://img.icons8.com/color/48/000000/bus.png';
+    if (schedule && schedule.icon) {
+        iconUrl = schedule.icon;
+    }
+
+    // Znajdź indeksy 3 najbliższych kursów
+    let nextIndexes = [];
+    if (schedule && schedule.stops && schedule.stops.length > 0 && schedule.stops[0].times) {
+        schedule.stops[0].times.forEach((t, idx) => {
+            const tMins = timeToMinutes(t);
+            if (tMins >= nowMins) nextIndexes.push({ idx, tMins });
+        });
+        if (nextIndexes.length < 3) {
+            for (let i = 0; i < 3 - nextIndexes.length; i++) {
+                nextIndexes.push({ idx: i, tMins: timeToMinutes(schedule.stops[0].times[i]) + 1440 });
+            }
+        }
+        nextIndexes = nextIndexes.slice(0, 3);
+    }
+
+    // Przygotuj tabelkę rozkładu
+    let timetableHtml = '';
+    if (schedule && schedule.stops && schedule.stops.length > 0 && schedule.stops[0].times) {
+        timetableHtml = `
+        <div class="popup-section-title">Najbliższe kursy (rozkład)</div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:2px 6px;">Przystanek</th>
+                    ${nextIndexes.map(obj => `<th style="padding:2px 6px;">${schedule.stops[0].times[obj.idx]}</th>`).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                ${schedule.stops.map(stop => `
+                    <tr>
+                        <td style="padding:2px 6px;">${stop.stop}</td>
+                        ${nextIndexes.map(obj => `<td style="padding:2px 6px;text-align:center;">${stop.times[obj.idx]}</td>`).join('')}
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        </div>
+        `;
+    }
+
+    return `
+        <div class="popup-header">
+            <div class="main-info">
+                <span class="title">
+                    <img src="${iconUrl}" alt="Estymata" style="width:18px;height:18px;vertical-align:-2px;margin-right:5px;">
+                    Linia: ${line} (estymata)
+                </span>
+                <span class="subtitle">Między: ${pos.stopA} → ${pos.stopB}</span>
+            </div>
+            <div class="actions"></div>
+        </div>
+        <div class="popup-details popup-section">
+            <dl>
+                <dt>Status:</dt><dd>Brak GPS – pozycja szacowana z rozkładu</dd>
+                <dt>Godzina:</dt><dd>${now.toLocaleTimeString('pl', { hour: '2-digit', minute: '2-digit' })}</dd>
+            </dl>
+        </div>
+        <div class="popup-section">
+            <div class="popup-section-title">Informacja</div>
+            <ul>
+                <li>Ten pojazd nie nadaje sygnału GPS.</li>
+                <li>Pozycja jest wyliczana na podstawie rozkładu jazdy.</li>
+            </ul>
+        </div>
+        <div class="popup-section">
+            ${timetableHtml}
+        </div>
+    `;
+}
+
+// Aktualizuj markery estymaty dla wszystkich linii
+function updateEstimatedMarkersFakeGps() {
+    fakeGpsLines.forEach(line => {
+        const schedule = fakeGpsSchedules[line];
+        if (!schedule) return;
+        // Obsługa nowej struktury: schedule.stops
+        const stopsArr = schedule.stops || schedule;
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        let pos = null;
+        if (stopsArr && stopsArr[0] && stopsArr[0].times) {
+            for (let i = 0; i < stopsArr[0].times.length; i++) {
+                for (let j = 0; j < stopsArr.length - 1; j++) {
+                    const tA = timeToMinutes(stopsArr[j].times[i]);
+                    const tB = timeToMinutes(stopsArr[j + 1].times[i]);
+                    if (nowMins >= tA && nowMins <= tB) {
+                        const stopA = stopsArr[j];
+                        const stopB = stopsArr[j + 1];
+                        const frac = (nowMins - tA) / (tB - tA);
+                        const lat = stopA.lat && stopB.lat ? stopA.lat + (stopB.lat - stopA.lat) * frac : null;
+                        const lon = stopA.lon && stopB.lon ? stopA.lon + (stopB.lon - stopA.lon) * frac : null;
+                        pos = { lat, lon, stopA: stopA.stop, stopB: stopB.stop };
+                        break;
+                    }
+                }
+                if (pos) break;
+            }
+        }
+        // Obsługa markerów
+        if (!pos || !pos.lat || !pos.lon) {
+            if (estimatedMarkers[line] && map.hasLayer(estimatedMarkers[line])) map.removeLayer(estimatedMarkers[line]);
+            estimatedMarkers[line] = null;
+            return;
+        }
+        if (estimatedMarkers[line]) {
+            estimatedMarkers[line].setLatLng([pos.lat, pos.lon]);
+            estimatedMarkers[line].setPopupContent(getFakeGpsPopupContent(line, pos, schedule));
+        } else {
+            estimatedMarkers[line] = L.marker([pos.lat, pos.lon], {
+                icon: getFakeGpsMarkerIcon(line)
+
+            }).bindPopup(getFakeGpsPopupContent(line, pos, schedule), { maxWidth: 320 });
+            estimatedMarkers[line].addTo(map);
+        }
+    });
+}
+
+// Dodaj na początku pliku JS (np. przed updateVehicleDataLoop)
+function saveMapState() {
+    try {
+        sessionStorage.setItem('vehicleData', JSON.stringify(Array.from(vehicleData.entries())));
+        sessionStorage.setItem('routeData', JSON.stringify(Array.from(routeData.entries())));
+        sessionStorage.setItem('stopData', JSON.stringify(Array.from(stopData.entries())));
+        sessionStorage.setItem('tripData', JSON.stringify(Array.from(tripData.entries())));
+        sessionStorage.setItem('lastMapCenter', JSON.stringify(map.getCenter()));
+        sessionStorage.setItem('lastMapZoom', map.getZoom());
+        // Dodaj inne dane, jeśli chcesz
+    } catch(e) { console.warn('Nie udało się zapisać stanu aplikacji:', e); }
+}
+
+let planRouteLine = null;
+
+function filterVehicles(filter) {
+    if (filter === 'favoriteRoutes') {
+        filterVehiclesByFavoriteRoutes();
+        return;
+    }
+    if (filter === 'route') {
+        const routeId = localStorage.getItem('activeRouteId');
+        if (routeId) {
+            filterVehiclesByRoute(routeId);
+            return;
+        }
+    }
+    try { localStorage.setItem('activeVehicleFilter', filter); } catch(e){}
+
+    // Ukryj wszystkie markery GPS i estymaty
+    markers.forEach((marker, id) => {
+        if (map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+    Object.values(estimatedMarkers).forEach(marker => {
+        if (marker && map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+
+    // Pokaż tylko wybrane markery GPS
+    markers.forEach((marker, id) => {
+        const v = vehicleData.get(id);
+        if (!v) return;
+        const rId = v.trip?.routeId;
+        const tabor = v.vehicle?.id;
+        const route = routeData.get(rId);
+        const vType = route ? (route.type === 0 || route.type === 1 || route.type === 2 ? 'tram' : 'bus') : determineVehicleType(rId, tabor);
+
+        let show = false;
+        if (filter === 'all') show = true;
+        else if (filter === 'tram' && vType === 'tram') show = true;
+        else if (filter === 'bus' && vType === 'bus') show = true;
+        else if (filter === 'favorites' && favorites.vehicles.some(f => f.vehicleId === id || (tabor && f.taborNumber === tabor))) show = true;
+        else if (filter === 'favoriteRoutes') {
+            const favRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]');
+            if (favRoutes.some(fr => fr.routeId === rId)) show = true;
+        }
+        // NIE pokazuj markerów GPS dla filtra estymata
+        if (filter !== 'estymata' && show && map && !map.hasLayer(marker)) map.addLayer(marker);
+    });
+
+    // Pokaż estymaty zgodnie z filtrem
+    Object.entries(estimatedMarkers).forEach(([line, marker]) => {
+        if (!marker) return;
+        let show = false;
+        const schedule = fakeGpsSchedules[line];
+        const routeType = schedule && schedule.type !== undefined ? schedule.type : null; // 0/1/2 tram, 3 bus
+        if (filter === 'all') show = true;
+        else if (filter === 'tram' && (routeType === 0 || routeType === 1 || routeType === 2)) show = true;
+        else if (filter === 'bus' && routeType === 3) show = true;
+        else if (filter === 'estymata') show = true; // Pokaż tylko estymaty
+        else if (filter === 'favoriteRoutes') {
+            const favRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]');
+            if (favRoutes.some(fr => fr.routeId === line)) show = true;
+        }
+        if (show && map && !map.hasLayer(marker)) map.addLayer(marker);
+    });
+}
+
+function filterVehiclesByFavoriteRoutes() {
+    try { localStorage.setItem('activeVehicleFilter', 'favoriteRoutes'); } catch(e){}
+    const favRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]');
+    // Ukryj wszystkie markery GPS i estymaty
+    markers.forEach((marker, id) => {
+        if (map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+    Object.values(estimatedMarkers).forEach(marker => {
+        if (marker && map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+    // Pokaż tylko pojazdy i estymaty z ulubionych tras
+    markers.forEach((marker, id) => {
+        const v = vehicleData.get(id);
+        if (!v) return;
+        const rId = v.trip?.routeId;
+        if (favRoutes && favRoutes.some(fr => fr.routeId === rId) && map && !map.hasLayer(marker)) map.addLayer(marker);
+    });
+    Object.entries(estimatedMarkers).forEach(([line, marker]) => {
+        if (!marker) return;
+        if (favRoutes && favRoutes.some(fr => fr.routeId === line) && map && !map.hasLayer(marker)) map.addLayer(marker);
+    });
+}
+
+function filterVehiclesByRoute(routeId) {
+    try { localStorage.setItem('activeVehicleFilter', 'route'); localStorage.setItem('activeRouteId', routeId); } catch(e){}
+    // Ukryj wszystkie markery GPS i estymaty
+    markers.forEach((marker, id) => {
+        if (map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+    Object.values(estimatedMarkers).forEach(marker => {
+        if (marker && map && map.hasLayer(marker)) map.removeLayer(marker);
+    });
+    // Pokaż tylko pojazdy i estymaty z wybranej trasy
+   
+    markers.forEach((marker, id) => {
+        const v = vehicleData.get(id);
+        if (!v) return;
+        const rId = v.trip?.routeId;
+        if (rId === routeId && map && !map.hasLayer(marker)) map.addLayer(marker);
+    });
+    updateEstimatedMarkersFakeGps();
+}
+
+function setLoaderText(txt) {
+    const loaderText = document.querySelector('.loader-text');
+    if (loaderText) loaderText.textContent = txt;
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    // ...Twoja inicjalizacja...
+    // Odczytaj stan z sessionStorage
+    try {
+        const vData = sessionStorage.getItem('vehicleData');
+        if (vData) {
+            const arr = JSON.parse(vData);
+            vehicleData.clear();
+            arr.forEach(([k, v]) => vehicleData.set(k, v));
+            // Odtwórz markery pojazdów z popupami
+            markers.clear();
+            vehicleData.forEach((v, id) => {
+                const lat = v.position?.latitude;
+                const lon = v.position?.longitude;
+                const tabor = v.vehicle?.id;
+                const rId = v.trip?.routeId;
+                const dirId = v.trip?.directionId;
+                const route = routeData.get(rId);
+                const vType = route ? (route.type === 0 || route.type === 1 || route.type === 2 ? 'tram' : 'bus') : determineVehicleType(rId, tabor);
+                const lineShortName = route?.shortName || '?';
+                const icon = getVehicleMarkerIcon(tabor, vType, dirId, lat, lon, lineShortName);
+
+                // --- Generowanie popupu ---
+                const headIcon = getVehicleIconUrl(tabor, vType);
+                const cId = v.trip?.tripId?.replace(/[\^ N\+].*$/, '');
+                const tInfo = cId ? tripData.get(cId) : null;
+                const dest = tInfo?.trip_headsign || "?";
+                const model = tabor ? getVehicleModel(tabor) : "?";
+                const delayData = calculateDelay(v) || { status: "?", delay: null, formattedDiff: null };
+                const dStatus = delayData.status;
+                const formattedDiff = delayData.formattedDiff;
+                const statusText = isTimeFormatEnabled && formattedDiff
+                    ? `${dStatus} (${formattedDiff})`
+                    : dStatus;
+                const lineBrig = getLineWithBrigade(rId, v.vehicle?.label);
+                let brig = "?"; if(label?.includes('/')) brig = label.split('/')[1]?.trim() || "?";
+                const rBtn = v.trip?.tripId ? `<button class="popup-button" onclick="displayRoute('${v.trip.tripId}')"><i class="fas fa-route"></i> Trasa</button>` : '';
+                const trailBtn = `<button class="popup-button secondary" onclick="showVehicleTrail('${id}')"><i class="fas fa-shoe-prints"></i> Historia kursu</button>`;
+                const sBtn = cId && stopTimesIndex.has(cId) ? `<button class="popup-button secondary" onclick="showTripSchedule(event,'${id}','${cId}')"><i class="fas fa-list-ol"></i> Przyst.</button>` : '';
+                const bBtn = brig !== '?' ? `<button class="popup-button secondary" onclick="showBrigadeSchedule(event,'${brig}')"><i class="fas fa-calendar-alt"></i> Bryg.</button>` : ''; // Pokaż tylko jeśli brygada jest znana
+                const saveRouteButton = `<button class="popup-button secondary" onclick="toggleFavoriteRoute('${rId}', '${v.stopId}', '${dest}')">
+    <i class="fas fa-heart"></i> Zapisz trasę
+</button>`;
+
+                // Generowanie dodatkowych informacji o pojeździe
+                const additionalInfo = generateAdditionalInfo(tabor, vehicleDictionary);
+
+                // Dodanie dodatkowych informacji do popupu
+                const pCont = `
+                    <div class="popup-header">
+                        <div class="main-info">
+                            <span class="title">
+                                <img src="${headIcon}" alt="${vType}" style="width:18px;height:18px;vertical-align:-2px;margin-right:5px;">
+                                Linia/Brygada: ${lineBrig}
+                            </span>
+                            <span class="subtitle">${dest}</span>
+                        </div>
+                        <div class="actions"></div>
+                    </div>
+                    <div class="popup-details popup-section">
+                        <dl>
+                            <dt>Nr taborowy:</dt><dd>${tabor || '?'}</dd>
+                            <dt>Model:</dt><dd>${model}</dd>
+                            <dt>Status:</dt><dd>${statusText}</dd>
+                            <dt>Prędkość:</dt><dd>${v.position.speed ? (v.position.speed * 3.6).toFixed(0) + ' km/h' : 'Brak danych'}</dd>
+                            <dt>Aktualizacja:</dt><dd>${v.timestamp ? new Date(v.timestamp * 1000).toLocaleTimeString('pl', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '?'}</dd>
+                        </dl>
+                    </div>
+                    ${additionalInfo}
+                    <div class="popup-button-group">
+                        ${rBtn}${sBtn}${bBtn}${trailBtn}${saveRouteButton}
+                    </div>
+                `;
+
+                const marker = L.marker([lat, lon], { icon }).bindPopup(pCont, { maxWidth: 320 });
+                markers.set(id, marker);
+                if (vehicleCluster) vehicleCluster.addLayer(marker);
+                else if (map) marker.addTo(map);
+            });
+        }
+
+        // Odtwórz widok mapy
+        const center = sessionStorage.getItem('lastMapCenter');
+        const zoom = sessionStorage.getItem('lastMapZoom');
+        if (center && zoom && map) {
+            const c = JSON.parse(center);
+            map.setView([c.lat, c.lng], parseInt(zoom));
+        }
+
+        // Odtwórz przystanki na mapie, jeśli mapa już gotowa i stopData nie jest puste
+        if (isMapInitialized && stopData.size > 0) {
+        } else {
+            // Jeśli mapa lub stopData nie są gotowe, spróbuj ponownie za chwilę
+            let tries = 0;
+            const tryUpdateStops = () => {
+                if (isMapInitialized && stopData.size > 0) {
+
+                } else if (tries < 10) {
+                    tries++;
+                    setTimeout(tryUpdateStops, 200);
+                }
+            };
+            tryUpdateStops();
+        }
+    } catch(e) { 
+        console.warn('Nie udało się odczytać stanu aplikacji:', e); 
+    }
+
+});    
+// --- Obsługa parametrów z zaplanuj.html ---
+const params = new URLSearchParams(window.location.search);
+const from = params.get('from');
+const to = params.get('to');
+if(from && to) {
+    showNotification('info', `Wybrana trasa: <b>${from}</b> → <b>${to}</b>`);
+    highlightStopByName(from);
+    highlightStopByName(to);
+    showPlanPanel();
+    document.getElementById('planFrom').value = from;
+    document.getElementById('planTo').value = to;
+}
+
+// --- Funkcje panelu planowania ---
+function showPlanPanel() {
+    document.getElementById('planPanel').style.display = 'block';
+    document.getElementById('planFrom').focus();
+}
+function hidePlanPanel() {
+    document.getElementById('planPanel').style.display = 'none';
+    document.getElementById('planPanelResult').style.display = 'none';
+}
+document.getElementById('planPanelForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const from = document.getElementById('planFrom').value.trim();
+    const to = document.getElementById('planTo').value.trim();
+    const result = document.getElementById('planPanelResult');
+    if(from && to){
+        result.style.display = 'block';
+        result.innerHTML = `
+            <b>Trasa z <span style="color:var(--accent,#99cc00)">${from}</span> do <span style="color:var(--accent,#99cc00)">${to}</span></b><br><br>
+            <button id="showOnMapBtnPanel" class="popup-button" style="margin-bottom:8px;"><i class="fas fa-map"></i> Podświetl ostatni przystanek</button>
+            <button id="drawLineBtnPanel" class="popup-button secondary" style="margin-bottom:8px;margin-left:8px;"><i class="fas fa-route"></i> Pokaż linię trasy</button>
+            <button id="reverseBtnPanel" class="popup-button secondary" style="margin-bottom:8px;margin-left:8px;"><i class="fas fa-retweet"></i> Odwrotna trasa</button>
+            <button id="clearLineBtnPanel" class="popup-button secondary" style="margin-bottom:8px;margin-left:8px;"><i class="fas fa-times"></i> Wyczyść linię</button>
+            <button id="clearBtnPanel" class="popup-button secondary" style="margin-bottom:8px;margin-left:8px;"><i class="fas fa-eraser"></i> Wyczyść pola</button>
+            <br>
+            <a href="zaplanuj.html?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}" style="margin-top:10px;display:inline-block;color:var(--accent,#99cc00);">Pełny planer &rarr;</a>
+        `;
+        setTimeout(() => {
+            const btn = document.getElementById('showOnMapBtnPanel');
+            if(btn) {
+                btn.onclick = function() {
+                    highlightStopByName(from);
+                    highlightStopByName(to);
+                    hidePlanPanel();
+                };
+            }
+            const drawLineBtn = document.getElementById('drawLineBtnPanel');
+            if(drawLineBtn) {
+                drawLineBtn.onclick = function() {
+                    drawRouteLineBetweenStops(from, to);
+                };
+            }
+            const clearLineBtn = document.getElementById('clearLineBtnPanel');
+            if(clearLineBtn) {
+                clearLineBtn.onclick = function() {
+                    clearRouteLine();
+                };
+            }
+            const reverseBtn = document.getElementById('reverseBtnPanel');
+            if(reverseBtn) {
+                reverseBtn.onclick = function() {
+                    document.getElementById('planFrom').value = to;
+                    document.getElementById('planTo').value = from;
+                    result.style.display = 'none';
+                };
+            }
+            const clearBtn = document.getElementById('clearBtnPanel');
+            if(clearBtn) {
+                clearBtn.onclick = function() {
+                    document.getElementById('planFrom').value = '';
+                    document.getElementById('planTo').value = '';
+                    result.style.display = 'none';
+                    clearRouteLine();
+                };
+            }
+        }, 100);
+    }
+});
+function highlightStopByName(name) {
+    if (!stopData || !stopData.size) return;
+    for (let [id, stop] of stopData) {
+        if (stop.name && stop.name.toLowerCase() === name.toLowerCase()) {
+            showStopOnMap(id);
+            break;
+        }
+    }
+}
+function drawRouteLineBetweenStops(fromName, toName) {
+    if (!map || !stopData || !stopData.size) return;
+    let fromCoord = null, toCoord = null;
+    for (let stop of stopData.values()) {
+        if (stop.name && stop.name.toLowerCase() === fromName.toLowerCase()) fromCoord = [stop.lat, stop.lon];
+        if (stop.name && stop.name.toLowerCase() === toName.toLowerCase()) toCoord = [stop.lat, stop.lon];
+    }
+    if (planRouteLine) {
+        map.removeLayer(planRouteLine);
+        planRouteLine = null;
+    }
+    if (fromCoord && toCoord) {
+        planRouteLine = L.polyline([fromCoord, toCoord], {color: "#003dcc", weight: 5, opacity: 0.8, dashArray: "8 8"}).addTo(map);
+        map.fitBounds([fromCoord, toCoord], {padding: [40,40]});
+    } else {
+        showNotification("warning", "Nie znaleziono współrzędnych przystanków.");
+    }
+}
+function clearRouteLine() {
+    if (planRouteLine && map) {
+        map.removeLayer(planRouteLine);
+        planRouteLine = null;
+    }
+}
+
+// --- Autocomplete dla przystanków w panelu planowania ---
+function setupStopAutocomplete(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+
+    input.addEventListener('input', function() {
+        const val = input.value.trim().toLowerCase();
+        if (!val || val.length < 2) {
+            list.innerHTML = '';
+            list.style.display = 'none';
+            return;
+        }
+        // Szukaj przystanków po nazwie lub kodzie
+        const matches = Array.from(stopData.values())
+            .filter(stop => stop.name && stop.name.toLowerCase().includes(val))
+            .slice(0, 8);
+
+        if (matches.length === 0) {
+            list.innerHTML = '<li class="no-results">Brak wyników</li>';
+            list.style.display = 'block';
+            return;
+        }
+        list.innerHTML = matches.map(stop =>
+            `<li>${stop.name}</li>`
+        ).join('');
+        list.style.display = 'block';
+
+        // Kliknięcie w podpowiedź
+        Array.from(list.children).forEach(li => {
+            li.onclick = function() {
+                input.value = this.textContent;
+                list.innerHTML = '';
+                list.style.display = 'none';
+            };
+        });
+    });
+
+    // Ukryj podpowiedzi przy utracie focusa
+    input.addEventListener('blur', function() {
+        setTimeout(() => { list.style.display = 'none'; }, 150);
+    });
+    input.addEventListener('focus', function() {
+        if (list.innerHTML) list.style.display = 'block';
+    });
+}
+
+// Po załadowaniu stopData:
+document.addEventListener('DOMContentLoaded', function() {
+    setupStopAutocomplete('planFrom', 'planFromAutocomplete');
+    setupStopAutocomplete('planTo', 'planToAutocomplete');
+});
+</script>
+</body>
+</html>

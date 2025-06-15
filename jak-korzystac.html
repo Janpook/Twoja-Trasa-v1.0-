@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N9G560TT5P"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-N9G560TT5P');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jak Korzystać z Mapy? - TwojaTrasa.online</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="favicons.png" onerror="this.onerror=null; this.href='https://img.icons8.com/ios-filled/50/000000/bus-stop.png';">
+    <style>
+        /* --- CSS SKOPIOWANE Z about.html / lista-pojazdow.html --- */
+        :root { --bg-primary: #1a1a1a; --bg-secondary: #262626; --bg-tertiary: #333333; --text-primary: #e0e0e0; --text-secondary: #9e9e9e; --text-tertiary: #6b6b6b; --accent: #99cc00; --accent-hover: #88bb00; --accent-yellow: #ffdd00; --text-on-accent: #1a1a1a; --border-color: #404040; --shadow-color: rgba(0, 0, 0, 0.2); --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; --font-size-base: 14px; --font-size-small: 12px; --font-size-large: 16px; --border-radius: 4px; --transition: all 0.2s ease-in-out; --danger-color: #f44336; --warning-color: #ff9800; --ok-color: var(--accent); --info-color: #00bcd4; --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c;}
+        body[data-theme="light"] { --bg-primary: #ffffff; --bg-secondary: #f5f5f5; --bg-tertiary: #eeeeee; --text-primary: #212121; --text-secondary: #757575; --text-tertiary: #bdbdbd; --accent: #77aa00; --accent-hover: #669900; --accent-yellow: #ffcc00; --text-on-accent: #ffffff; --border-color: #e0e0e0; --shadow-color: rgba(0, 0, 0, 0.1); --danger-color: #e53935; --warning-color: #fb8c00; --ok-color: var(--accent); --info-color: #00acc1; --discord-color: #5865F2; --discord-hover: #4a56d4; --buycoffee-color: #FF813F; --buycoffee-hover: #f06d2c;}
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family); font-size: var(--font-size-base); background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.7; transition: var(--transition); padding-top: 55px; }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); font-weight: 500; }
+        a:hover { color: var(--accent-hover); text-decoration: underline; }
+        button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+        ul { list-style: disc; padding-left: 20px; margin-left: 1.1em; } /* Domyślnie styl listy dla przewodnika */
+        .top-bar { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; transition: var(--transition); }
+        .top-bar .logo { font-size: var(--font-size-large); font-weight: 600; color: var(--text-primary); }
+        .top-bar .logo span { color: var(--accent); }
+        .logo-option-2 { display: flex; align-items: center; }
+        .logo-option-2 .logo-icon { margin-right: 8px; font-size: 1.2em; color: var(--accent); line-height: 1; }
+        .logo-option-2 span { color: var(--accent); }
+        .top-bar .nav-links { display: flex; }
+        .top-bar .back-link { color: var(--accent); text-decoration: none; font-size: var(--font-size-base); transition: var(--transition); display: flex; align-items: center; gap: 5px; margin-left: 10px; }
+        .top-bar .back-link:hover { color: var(--accent-hover); }
+        .container { max-width: 850px; margin: 20px auto; padding: 30px; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+        .page-header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .page-header h1 { font-size: calc(var(--font-size-large) + 6px); font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: inline-flex; align-items: center; gap: 12px; border: none; padding: 0; }
+        .page-header h1 i { color: var(--accent); }
+        .page-header .subtitle { font-size: var(--font-size-large); color: var(--text-secondary); margin-top: 0; }
+        .content-section { margin-bottom: 35px; }
+        .content-section h2 { font-size: calc(var(--font-size-large) + 2px); font-weight: 500; margin-bottom: 15px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; transition: var(--transition); display: flex; align-items: center; gap: 10px; }
+        .content-section h2 i { color: var(--accent); width: 1.1em; text-align: center; }
+        p { margin-bottom: 1em; font-size: var(--font-size-base); }
+        strong { font-weight: 600; color: var(--text-primary); }
+        .content-section ul li { margin-bottom: 0.5em; }
+        .key-icon {
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            line-height: 1.2em;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            margin: 0 2px;
+            font-size: 0.9em;
+        }
+        .note { font-size: var(--font-size-small); color: var(--text-tertiary); border-left: 3px solid var(--border-color); padding: 5px 0 5px 15px; margin: 20px 0; background-color: transparent; border-radius: 0; }
+        .footer-note { text-align: center; margin-top: 40px; font-size: var(--font-size-small); color: var(--text-tertiary); border-top: 1px solid var(--border-color); padding-top: 20px; }
+
+        @media (max-width: 768px) {
+            :root { --font-size-base: 13px; --font-size-small: 11px; --font-size-large: 15px; }
+            .top-bar { height: 50px; padding: 0 10px; }
+            .top-bar .logo { font-size: 18px; }
+            .top-bar .back-link { font-size: var(--font-size-base); }
+            body { padding-top: 50px; }
+            .container { margin: 15px; padding: 20px; }
+            .page-header h1 { font-size: 20px; }
+            .page-header .subtitle { font-size: var(--font-size-base); }
+            .content-section h2 { font-size: 18px; }
+            p, .content-section ul li { font-size: var(--font-size-base); }
+            .note { font-size: 11px; padding-left: 10px; }
+            .footer-note { font-size: 11px; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="top-bar">
+        <div class="logo logo-option-2">
+            <i class="fas fa-map-marker-alt logo-icon"></i> Twoja<span>Trasa</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Mapa</a>
+            <a href="menu.html" class="back-link"><i class="fas fa-bars"></i> Menu</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-question-circle"></i> Jak Korzystać z Mapy?</h1>
+            <p class="subtitle">Krótki przewodnik po funkcjach TwojaTrasa.online</p>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-desktop"></i> Ogólny Interfejs</h2>
+            <p>Głównym elementem serwisu jest interaktywna mapa, na której wyświetlane są pojazdy komunikacji miejskiej. Po lewej stronie (lub na dole na urządzeniach mobilnych) znajdziesz panel z opcjami filtrowania i wyszukiwania. W prawym górnym rogu mapy znajdują się przyciski do zmiany warstw mapy oraz centrowania widoku.</p>
+            <p>Dolny pasek nawigacyjny (<span class="key-icon"><i class="fas fa-bars"></i></span> Menu) umożliwia dostęp do dodatkowych podstron, takich jak ta, którą właśnie czytasz, "O projekcie", "Lista Pojazdów" czy ustawień.</p>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-layer-group"></i> Warstwy Mapy i Widok</h2>
+            <ul>
+                <li><strong>Zmiana podkładu mapy:</strong> W prawym górnym rogu mapy znajdziesz ikonę <span class="key-icon"><i class="fas fa-layer-group"></i></span>. Kliknięcie jej rozwija listę dostępnych podkładów mapy (np. styl uliczny, satelitarny).</li>
+                <li><strong>Wyświetlanie przystanków:</strong> Domyślnie przystanki są widoczne na mapie. Ich widoczność może zależeć od poziomu przybliżenia.</li>
+                <li><strong>Trasy linii:</strong> Po wybraniu konkretnej linii w filtrach, jej trasa zostanie podświetlona na mapie.</li>
+                <li><strong>Zoom:</strong> Używaj przycisków <span class="key-icon">+</span> / <span class="key-icon">-</span> na mapie lub kółka myszy (gestu szczypania na mobile) do przybliżania i oddalania widoku.</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-filter"></i> Filtrowanie Pojazdów</h2>
+            <p>Panel filtrowania pozwala dostosować, które pojazdy są widoczne na mapie:</p>
+            <ul>
+                <li><strong>Wybór linii:</strong> Możesz wybrać jedną lub więcej linii tramwajowych i autobusowych. Kliknij na numer linii, aby ją zaznaczyć lub odznaczyć.</li>
+                <li><strong>Typ pojazdu:</strong> Zaznacz "Tramwaje" lub "Autobusy", aby wyświetlić tylko pojazdy danego typu.</li>
+                <li><strong>Filtrowanie po numerze taborowym:</strong> Wpisz konkretny numer taborowy w polu wyszukiwania, aby szybko zlokalizować dany pojazd (jeśli jest aktualnie online).</li>
+                <li><strong>Przyciski "Wszystkie" / "Żadne":</strong> Umożliwiają szybkie zaznaczenie lub odznaczenie wszystkich linii danego typu.</li>
+            </ul>
+            <p class="note">Pamiętaj, że filtry działają łącznie. Jeśli np. wybierzesz linię tramwajową i zaznaczysz filtr "Autobusy", nie zobaczysz żadnych pojazdów.</p>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-search"></i> Wyszukiwanie</h2>
+            <p>Nad listą linii znajduje się pole wyszukiwania. Możesz w nim wpisać:</p>
+            <ul>
+                <li><strong>Numer linii:</strong> Np. "5", "178". Spowoduje to odfiltrowanie listy linii do pasujących wyników.</li>
+                <li><strong>Nazwę przystanku:</strong> (Funkcjonalność może być w trakcie rozwoju) W przyszłości pozwoli na szybkie zlokalizowanie przystanku na mapie.</li>
+                <li><strong>Numer taborowy:</strong> Np. "615", "1481". Jeśli pojazd o danym numerze jest online, zostanie wyświetlony na mapie, a mapa zostanie na nim wycentrowana.</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-mouse-pointer"></i> Informacje o Pojeździe</h2>
+            <p>Kliknięcie na ikonę pojazdu na mapie wyświetli dymek (popup) z dodatkowymi informacjami, takimi jak:</p>
+            <ul>
+                <li>Numer linii</li>
+                <li>Kierunek jazdy</li>
+                <li>Numer taborowy</li>
+                <li>Model pojazdu (jeśli dostępny)</li>
+                <li>Prędkość</li>
+                <li>Opóźnienie (jeśli dostępne i większe od zera)</li>
+                <li>Czas ostatniej aktualizacji pozycji</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-location-arrow"></i> Moja Lokalizacja</h2>
+            <p>Na mapie znajduje się przycisk <span class="key-icon"><i class="fas fa-crosshairs"></i></span> (lub podobny). Kliknięcie go spowoduje próbę ustalenia Twojej aktualnej pozycji geograficznej i wycentrowania na niej mapy.</p>
+            <p class="note">Aby ta funkcja zadziałała, musisz zezwolić przeglądarce na dostęp do Twojej lokalizacji. Twoje dane o lokalizacji są przetwarzane wyłącznie w Twojej przeglądarce i nie są wysyłane ani przechowywane na serwerze.</p>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-cog"></i> Ustawienia</h2>
+            <p>Dostęp do niektórych ustawień znajdziesz w menu (<span class="key-icon"><i class="fas fa-bars"></i></span> Menu -> <span class="key-icon"><i class="fas fa-cogs"></i></span> Ustawienia):</p>
+            <ul>
+                <li><strong>Motyw:</strong> Możesz przełączać się między jasnym a ciemnym motywem interfejsu, aby dopasować wygląd do swoich preferencji lub warunków oświetleniowych.</li>
+                <li><strong>Inne ustawienia:</strong> W przyszłości mogą pojawić się tu dodatkowe opcje personalizacji.</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2><i class="fas fa-lightbulb"></i> Dodatkowe Porady</h2>
+            <ul>
+                <li><strong>Odświeżanie danych:</strong> Pozycje pojazdów są aktualizowane automatycznie co kilkanaście-kilkadziesiąt sekund. Nie ma potrzeby ręcznego odświeżania strony.</li>
+                <li><strong>Wydajność:</strong> Przy dużej liczbie aktywnych pojazdów i włączonych wszystkich liniach, mapa może działać wolniej na starszych urządzeniach. Korzystanie z filtrów pomaga poprawić wydajność.</li>
+                <li><strong>Błędy i sugestie:</strong> Jeśli zauważysz jakiś błąd lub masz pomysł na ulepszenie serwisu, zapraszam do kontaktu poprzez <a href="about.html">stronę "O projekcie"</a>.</li>
+            </ul>
+            <p>Mam nadzieję, że ten przewodnik pomoże Ci w pełni korzystać z TwojaTrasa.online. Miłego podróżowania!</p>
+        </div>
+
+        <div class="footer-note">
+              TwojaTrasa.online &copy; <span id="currentYear">2024</span>. Tworzone z pasją. | <a href="polityka-prywatnosci.html">Polityka Prywatności</a> | <a href="cookies.html">Ustawienia Cookies</a>
+        </div>
+    </div>
+
+    <script>
+        function applyTheme(theme) { document.body.setAttribute('data-theme', theme); }
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentTheme = 'dark'; try { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark' || savedTheme === 'light') { currentTheme = savedTheme; } } catch (e) {} applyTheme(currentTheme);
+            const yearSpan = document.getElementById('currentYear'); if(yearSpan) { const y = new Date().getFullYear(); yearSpan.textContent = y > 2024 ? `2024-${y}` : y; }
+        });
+    </script>
+</body>
+</html>
