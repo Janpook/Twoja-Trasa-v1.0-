@@ -74,7 +74,7 @@ Główne pliki aplikacji w wersji 1.0:
 * `proxy.php`: Skrypt po stronie serwera do pobierania danych GTFS-RT (nieudostępniony w kodzie).
 * `*.txt`, `*.js` (dane): Pliki statyczne GTFS oraz dane o trasach i modelach.
 
-## Jak Uruchomić Lokalni
+## Jak Uruchomić Lokalnie
 
 1.  Sklonuj repozytorium:
     ```bash
