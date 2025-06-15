@@ -1,7 +1,5 @@
 # TwojaTrasa.online - Wersja 1.0 (Archiwalna)
 
-![Logo Aplikacji](https://twojatrasa.online/favicons.png)
-
 Aplikacja webowa do śledzenia komunikacji miejskiej w Poznaniu w czasie rzeczywistym. Projekt w wersji 1.0 został stworzony w oparciu o czysty HTML, CSS i JavaScript, intensywnie wykorzystując dane GTFS i GTFS-Realtime.
 
 * **Licencja:** GNU AGPLv3
